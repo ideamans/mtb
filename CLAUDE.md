@@ -1,9 +1,10 @@
-# CLAUDE.md — movable-type-builder-cli
+# CLAUDE.md — mtb
 
 Movable Type のサイトを組み立てる CLI（Movable Type Builder CLI）。
-土台は Data API (v7)。**バイナリ名は `mtb`**（リポジトリ名と
-リリースアーカイブ名は `movable-type-builder-cli`。main パッケージは
-`cmd/mtb` にあるので `go install .../cmd/mtb@latest` は `mtb` を作る）。
+土台は Data API (v7)。**バイナリ名・リポジトリ名（`ideamans/mtb`）・リリースアーカイブ名・
+Claude プラグイン名はどれも `mtb`**（2026-11-08 に `movable-type-builder-cli` から改名。
+v0.1.0 のアーカイブだけ旧名）。main パッケージは `cmd/mtb` にあるので
+`go install github.com/ideamans/mtb/cmd/mtb@latest` は `mtb` を作る。
 
 **リポジトリは public（MIT。2026-11-06 に公開）。** 配布はバイナリが GitHub Releases と
 bin.ideamans.com（カテゴリ `mtb`。インストールスクリプト `install/mtb.sh`）、
@@ -99,7 +100,7 @@ Data API を薄く包むことではない。**API の形をそのまま利用�
 | | `internal/llmdocs/90-commands.md` | **生成物。手編集しない** → `go generate ./...` |
 | | `plugins/*/skills/*/references/tags-*.md` `modifiers.md` | **生成物。手編集しない** → 同上。原本は `internal/mtdocs/source/` |
 | | `internal/spec/spec.json` | **生成物。手編集しない** → 同上 |
-| | `plugins/movable-type-builder-cli/skills/*/SKILL.md` | 手順や前提が変わったとき |
+| | `plugins/mtb/skills/*/SKILL.md` | 手順や前提が変わったとき |
 
 ③ を忘れやすい。ドキュメントとヘルプは人間が読んで気づくが、**LLMナレッジが
 古いことには誰も気づかない**（エージェントが黙って間違えるだけ）。
@@ -226,7 +227,7 @@ JSON を返す。そのまま出すと人が読めず、エージェントには
 
 `PluginVersion`（`internal/cmd/root.go`）と `plugin.json` の `version` と git タグ
 の3つを揃える。テストとリリースワークフローが不一致を検出する。手順は
-`plugins/movable-type-builder-cli/PUBLISH.md`。
+`plugins/mtb/PUBLISH.md`。
 
 ## 確認
 

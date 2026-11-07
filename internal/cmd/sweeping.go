@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // sweepingOps は「入れ物ごと壊す」操作です。--yes だけでは実行させません。

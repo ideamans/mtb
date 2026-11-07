@@ -12,8 +12,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 // テンプレートをローカルのディレクトリと往復させます。

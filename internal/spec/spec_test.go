@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 func TestLoad(t *testing.T) {

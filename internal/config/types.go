@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 const (

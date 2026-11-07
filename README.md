@@ -32,13 +32,13 @@ curl -fsSL https://bin.ideamans.com/install/mtb.sh | bash
 `irm https://bin.ideamans.com/install/mtb.ps1 | iex`。apt・yum・Scoop・Chocolatey は
 <https://bin.ideamans.com/mtb/mtb> にあります。
 
-[GitHub のリリース](https://github.com/ideamans/movable-type-builder-cli/releases)から
-取ることもできます。**アーカイブ名はリポジトリ名、中のバイナリは `mtb`** です。
+[GitHub のリリース](https://github.com/ideamans/mtb/releases)から
+取ることもできます。アーカイブは `mtb_<版>_<OS>_<CPU>.tar.gz`（Windows は `.zip`）で、中のバイナリは `mtb` です。
 
 ソースから入れる場合（main パッケージはモジュール直下ではありません）:
 
 ```bash
-go install github.com/ideamans/movable-type-builder-cli/cmd/mtb@latest
+go install github.com/ideamans/mtb/cmd/mtb@latest
 ```
 
 ## 接続先（プロファイル）
@@ -568,13 +568,13 @@ Claude Code ではプラグインを導入すると6つのスキルが使えま�
 
 ```
 /plugin marketplace add ideamans/claude-public-plugins
-/plugin install movable-type-builder-cli@ideamans-plugins
+/plugin install mtb@ideamans-plugins
 ```
 
 同じスキルは Copilot や Cursor など Agent Skills 対応ホストでも使えます。
 
 ```bash
-gh skill install ideamans/movable-type-builder-cli/plugins/movable-type-builder-cli/skills/mtb-usage --agent copilot
+gh skill install ideamans/mtb/plugins/mtb/skills/mtb-usage --agent copilot
 ```
 
 ## 開発

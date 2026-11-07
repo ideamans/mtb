@@ -3,7 +3,7 @@
 // 原本は internal/mtdocs/source/*.json（事実だけ）と summaries.json（自前の要約）。
 // **マニュアルの文章は書き出さない。** 各タグは要約・属性の書き方・マニュアルの
 // ページへのリンクだけにする（internal/mtdocs のパッケージ説明を参照）。出力先は
-// plugins/movable-type-builder-cli/skills/*/references/*.md です。
+// plugins/mtb/skills/*/references/*.md です。
 // go generate から呼ばれ、CI が再生成して差分が出たら失敗します。
 //
 // -fetch を付けると、原本そのものを movabletype.jp から取り直します
@@ -19,12 +19,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/mtdocs"
+	"github.com/ideamans/mtb/internal/mtdocs"
 )
 
 var (
 	fetch   = flag.Bool("fetch", false, "movabletype.jp から原本を取り直す")
-	out     = flag.String("out", "../../plugins/movable-type-builder-cli/skills", "スキルの置き場")
+	out     = flag.String("out", "../../plugins/mtb/skills", "スキルの置き場")
 	srcDir  = flag.String("source", "../mtdocs/source", "原本の置き場（-fetch のとき書き出す先）")
 	cache   = flag.String("cache", "", "取得した HTML の置き場（既定は一時ディレクトリ）")
 	verbose = flag.Bool("v", false, "経過を出す")

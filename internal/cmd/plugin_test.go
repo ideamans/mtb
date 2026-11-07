@@ -12,7 +12,7 @@ import (
 // Copilot / Cursor / Gemini CLI にも入るため）、そして「利用者がこの道具を
 // 必要とするときに口にする語」が description に残っていることを見ます。
 func TestPluginSkills(t *testing.T) {
-	report := skillcheck.CheckDir("../../plugins/movable-type-builder-cli", skillcheck.Options{
+	report := skillcheck.CheckDir("../../plugins/mtb", skillcheck.Options{
 		Version:             PluginVersion,
 		Keywords:            []string{"movable type", "data api", "entry", "install", "template", "content type"},
 		RequireInstallSkill: true,

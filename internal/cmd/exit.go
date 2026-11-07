@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/prompt"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/prompt"
 )
 
 // 終了コード。エージェントやスクリプトが「何が起きたか」で分岐できるように、

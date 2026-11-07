@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
+	"github.com/ideamans/mtb/internal/config"
 )
 
 func newStore(t *testing.T, env map[string]string) (*config.Store, *config.MemStorage) {

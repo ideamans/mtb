@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 // Store は設定と認証情報の読み書きの入口です。

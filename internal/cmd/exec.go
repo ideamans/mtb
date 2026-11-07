@@ -13,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // errAborted は確認を断ったときのエラーです。3箇所から同じ文言を返すので

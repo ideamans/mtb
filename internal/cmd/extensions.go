@@ -12,10 +12,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/extension"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // 拡張（エクステンション）は、MT のプラグインが足した Data API の

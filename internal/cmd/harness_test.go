@@ -13,10 +13,10 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/prompt"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/prompt"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 const testNow = 1_700_000_000

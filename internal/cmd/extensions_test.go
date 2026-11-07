@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
+	"github.com/ideamans/mtb/internal/extension"
 )
 
 const testExtManifest = `{"name":"entry-author","version":"0.1.0","description":"Change the author","descriptionJa":"作成者を変える",

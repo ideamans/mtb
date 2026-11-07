@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // logsStub はログ一覧の応答を作ります。

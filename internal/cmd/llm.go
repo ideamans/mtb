@@ -5,9 +5,9 @@ import (
 
 	"github.com/ideamans/go-llm-cli-kit/llmcmd"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/llmdocs"
+	"github.com/ideamans/mtb/internal/extension"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/llmdocs"
 )
 
 // LLMConfig は `mtb llm` サブコマンドの設定です。main からも参照し、

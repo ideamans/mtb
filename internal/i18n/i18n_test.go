@@ -3,7 +3,7 @@ package i18n_test
 import (
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 func env(m map[string]string) func(string) string {

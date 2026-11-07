@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/mtdocs"
+	"github.com/ideamans/mtb/internal/mtdocs"
 )
 
 // 分類の順番には意味がある。folder を category より先に見ないと、

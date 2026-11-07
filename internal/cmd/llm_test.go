@@ -7,7 +7,7 @@ import (
 
 	"github.com/ideamans/go-llm-cli-kit/llmcmd"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/llmdocs"
+	"github.com/ideamans/mtb/internal/llmdocs"
 )
 
 func TestEmbeddedReference(t *testing.T) {

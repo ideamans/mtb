@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // allFlag は「全部取る」フラグです。

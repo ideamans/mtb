@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
+	"github.com/ideamans/mtb/internal/config"
 )
 
 func TestProfileAddNormalizesURLAndBecomesCurrent(t *testing.T) {

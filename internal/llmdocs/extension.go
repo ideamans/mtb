@@ -6,7 +6,7 @@ import (
 
 	kit "github.com/ideamans/go-llm-cli-kit/llmdocs"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
+	"github.com/ideamans/mtb/internal/extension"
 )
 
 // WithExtensions は埋め込みリファレンスに拡張の章を足したものです。

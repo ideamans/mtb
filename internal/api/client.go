@@ -21,8 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 // Doer は HTTP リクエストの送信です。*http.Client がそのまま満たします。

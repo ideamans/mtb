@@ -14,7 +14,7 @@ import (
 
 	"golang.org/x/term"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 // ErrNotInteractive は対話できない場面で入力を求められたときのエラーです。

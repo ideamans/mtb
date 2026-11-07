@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 // baseURLExample は聞くときに見せる例です。README とスキルの例に合わせて

@@ -1,4 +1,4 @@
-module github.com/ideamans/movable-type-builder-cli
+module github.com/ideamans/mtb
 
 go 1.25.0
 

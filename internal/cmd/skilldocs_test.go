@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/mtdocs"
+	"github.com/ideamans/mtb/internal/mtdocs"
 )
 
-const skillsDir = "../../plugins/movable-type-builder-cli/skills"
+const skillsDir = "../../plugins/mtb/skills"
 
 // 配布する参照ファイルは 500KB を超える生成物で、壊れても誰も気づかない。
 // 原本との対応をここで縛る。

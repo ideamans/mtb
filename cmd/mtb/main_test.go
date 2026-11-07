@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/cmd"
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/prompt"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/cmd"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/prompt"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // testEnv は外に一切触れない Env です。main の配線だけを見ます。

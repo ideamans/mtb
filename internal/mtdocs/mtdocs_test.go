@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/mtdocs"
+	"github.com/ideamans/mtb/internal/mtdocs"
 )
 
 // 原本が読めること、そして中身が痩せていないこと。

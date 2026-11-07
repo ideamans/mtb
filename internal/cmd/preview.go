@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // プレビューは「保存せずに描く」ためのエンドポイントです。テンプレートを

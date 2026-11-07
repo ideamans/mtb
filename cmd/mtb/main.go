@@ -6,7 +6,7 @@ package main
 // `make spec` で作り直してから `go generate ./...` を流します（spec.json が
 // コマンドツリーの素なので、この順でないとカタログが古いツリーから描かれる）。
 //go:generate go run ../../internal/gen-llmdocs -out ../../internal/llmdocs/90-commands.md
-//go:generate go run ../../internal/gen-skilldocs -out ../../plugins/movable-type-builder-cli/skills -source ../../internal/mtdocs/source
+//go:generate go run ../../internal/gen-skilldocs -out ../../plugins/mtb/skills -source ../../internal/mtdocs/source
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ import (
 
 	"github.com/ideamans/go-llm-cli-kit/llmcmd"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/cmd"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/cmd"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
+	"github.com/ideamans/mtb/internal/config"
 )
 
 func TestParseDotEnv(t *testing.T) {

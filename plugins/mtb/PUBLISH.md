@@ -1,4 +1,4 @@
-# Publishing the movable-type-builder-cli plugin
+# Publishing the mtb plugin
 
 ## Before every release
 
@@ -7,7 +7,7 @@
 2. `go test ./...` — includes `TestPluginSkills`, which enforces that
    `plugin.json.version` equals `PluginVersion` in `internal/cmd/root.go` and
    that the SKILL.md frontmatter stays within the Agent Skills standard.
-3. `claude plugin validate plugins/movable-type-builder-cli`.
+3. `claude plugin validate plugins/mtb`.
 4. Bump `PluginVersion` and `plugin.json.version` together, in the same commit
    as the release tag. The release workflow refuses a mismatched tag.
 
@@ -20,11 +20,11 @@ private; that entry was removed when the repository went public (2026-11-06).
 
 ```json
 {
-  "name": "movable-type-builder-cli",
+  "name": "mtb",
   "source": {
     "source": "git-subdir",
-    "url": "https://github.com/ideamans/movable-type-builder-cli.git",
-    "path": "plugins/movable-type-builder-cli"
+    "url": "https://github.com/ideamans/mtb.git",
+    "path": "plugins/mtb"
   }
 }
 ```
@@ -33,7 +33,7 @@ private; that entry was removed when the repository went public (2026-11-06).
 
 ```
 /plugin marketplace add ideamans/claude-public-plugins
-/plugin install movable-type-builder-cli@ideamans-plugins
+/plugin install mtb@ideamans-plugins
 /mtb-usage
 ```
 
@@ -51,7 +51,7 @@ private; that entry was removed when the repository went public (2026-11-06).
 資料は movabletype.jp の公式ドキュメントと、実機の MT 9.0.9 から起こしてある。
 
 ```bash
-gh skill install ideamans/movable-type-builder-cli/plugins/movable-type-builder-cli/skills/mtb-usage --agent copilot
+gh skill install ideamans/mtb/plugins/mtb/skills/mtb-usage --agent copilot
 ```
 
 Neither route needs a GitHub login.

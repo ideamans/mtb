@@ -7,7 +7,7 @@ import (
 	"path"
 	"sort"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
+	"github.com/ideamans/mtb/internal/api"
 )
 
 // 環境の記録。**運べないが、違っていると分かるだけで価値があるもの**です。

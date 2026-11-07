@@ -14,18 +14,18 @@ import (
 	"github.com/ideamans/go-llm-cli-kit/llmcmd"
 	"github.com/spf13/cobra"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/extension"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // PluginVersion はこのCLIのリリースバージョンです。
-// plugins/movable-type-builder-cli/.claude-plugin/plugin.json の version と
+// plugins/mtb/.claude-plugin/plugin.json の version と
 // 一致していることをテストが、git タグと一致していることをリリース
 // ワークフローが検査します。
-const PluginVersion = "0.1.0"
+const PluginVersion = "0.1.1"
 
 // Version はビルド時に -ldflags で上書きされるバージョン文字列です。
 var Version = PluginVersion

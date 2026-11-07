@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // ID を渡して本体を省いたら、保存済みの中身を取ってきて添える。

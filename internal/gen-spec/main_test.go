@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 func TestKebab(t *testing.T) {

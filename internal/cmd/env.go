@@ -10,11 +10,11 @@ import (
 
 	"github.com/ideamans/go-llm-cli-kit/skillcheck"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/api"
-	"github.com/ideamans/movable-type-builder-cli/internal/config"
-	"github.com/ideamans/movable-type-builder-cli/internal/extension"
-	"github.com/ideamans/movable-type-builder-cli/internal/prompt"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/extension"
+	"github.com/ideamans/mtb/internal/prompt"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // Env は CLI が外の世界に触れる口をすべて集めたものです。

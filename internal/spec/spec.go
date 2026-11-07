@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 //go:embed spec.json

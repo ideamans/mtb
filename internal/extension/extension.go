@@ -28,8 +28,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
-	"github.com/ideamans/movable-type-builder-cli/internal/spec"
+	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/spec"
 )
 
 // ManifestFile は拡張のディレクトリに置くマニフェストの名前です。

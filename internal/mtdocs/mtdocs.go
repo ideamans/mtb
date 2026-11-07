@@ -1,6 +1,6 @@
 // Package mtdocs は Movable Type のテンプレートタグ・権限・ロール・アーカイブの
 // 資料を保持します。ここから配布スキルの参照ファイル
-// （plugins/movable-type-builder-cli/skills/*/references/*.md）を生成します。
+// （plugins/mtb/skills/*/references/*.md）を生成します。
 // 生成器は internal/gen-skilldocs です。**参照ファイルを手編集しないこと。**
 //
 // **マニュアルの文章は持ちません。** movabletype.jp のマニュアルは Six Apart の

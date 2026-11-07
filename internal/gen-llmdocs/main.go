@@ -10,8 +10,8 @@ import (
 
 	"github.com/ideamans/go-llm-cli-kit/catalog"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/cmd"
-	"github.com/ideamans/movable-type-builder-cli/internal/i18n"
+	"github.com/ideamans/mtb/internal/cmd"
+	"github.com/ideamans/mtb/internal/i18n"
 )
 
 var outPath = flag.String("out", "90-commands.md", "書き出す先")

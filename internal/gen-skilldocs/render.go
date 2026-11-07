@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ideamans/movable-type-builder-cli/internal/mtdocs"
+	"github.com/ideamans/mtb/internal/mtdocs"
 )
 
 // modifierCategories はグローバルモディファイアの並べ方です。
