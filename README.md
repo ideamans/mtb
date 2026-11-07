@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/logo.svg" alt="mtb" width="280"></p>
+
 # mtb — Movable Type Builder CLI
 
 Movable Type のサイトを、コマンドラインから組み立てる Go 製 CLI です。
