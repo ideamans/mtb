@@ -8,6 +8,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ import (
 // plugins/mtb/.claude-plugin/plugin.json の version と
 // 一致していることをテストが、git タグと一致していることをリリース
 // ワークフローが検査します。
-const PluginVersion = "0.1.1"
+const PluginVersion = "0.2.0"
 
 // Version はビルド時に -ldflags で上書きされるバージョン文字列です。
 var Version = PluginVersion
@@ -34,7 +35,6 @@ var Version = PluginVersion
 type globals struct {
 	profile        string
 	baseURL        string
-	apiVersion     string
 	clientID       string
 	format         string
 	compact        bool
@@ -88,13 +88,18 @@ func New(env *Env, args ...string) *App {
 				"リソース操作のコマンドは Data API (v7) の公式定義から作られているので、\n"+
 				"リファレンスのパスとコマンド名が1対1で対応します。それに加えて、\n"+
 				"API に無い「まとめて送る・組み立てる・取り出す」を mtb が受け持ちます\n"+
-				"（--dir・--set・--extract・templates pull/push など）。",
+				"（--dir・--set・--extract・templates pull/push など）。\n\n"+
+				"Data API の版はプロファイルに紐づきます。古い MT（v1〜v6）は\n"+
+				"mtb profile add/set --api-version で版を決め、その版に無い操作は送る前に止めます。",
 			"Build Movable Type sites from the command line.\n"+
 				"Switch between servers with profiles; sign in once with mtb auth login.\n\n"+
 				"The resource commands are generated from the official Data API (v7) definition,\n"+
 				"so command names map one-to-one onto the paths in the reference. On top of that,\n"+
 				"mtb supplies the bulk, compose and extract operations the API does not have\n"+
-				"(--dir, --set, --extract, templates pull/push and so on)."),
+				"(--dir, --set, --extract, templates pull/push and so on).\n\n"+
+				"The Data API version belongs to the profile. For an older MT (v1 to v6),\n"+
+				"set it with mtb profile add/set --api-version; operations that version lacks\n"+
+				"are stopped before they are sent."),
 		Version:       Version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -110,7 +115,6 @@ func New(env *Env, args ...string) *App {
 	f := a.root.PersistentFlags()
 	f.StringVar(&a.g.profile, "profile", "", i18n.T("使うプロファイル名（既定は config.json の current）", "profile to use (defaults to the current profile in config.json)"))
 	f.StringVar(&a.g.baseURL, "base-url", "", i18n.T("mt-data-api.cgi までの URL（プロファイルより優先）", "URL up to mt-data-api.cgi (overrides the profile)"))
-	f.StringVar(&a.g.apiVersion, "api-version", "", i18n.T("エンドポイントのバージョン（既定 "+config.DefaultAPIVersion+"）", "endpoint version (default "+config.DefaultAPIVersion+")"))
 	f.StringVar(&a.g.clientID, "client-id", "", i18n.T("認証時に名乗る clientId（既定 "+config.DefaultClientID+"）", "clientId to present when signing in (default "+config.DefaultClientID+")"))
 	f.StringVar(&a.g.format, "format", "auto", i18n.T("出力形式 auto|json|raw", "output format: auto|json|raw"))
 	f.BoolVar(&a.g.compact, "compact", false, i18n.T("JSON を1行で出す", "print JSON on one line"))
@@ -184,16 +188,38 @@ func (a *App) resolve() (*config.Resolved, error) {
 		return nil, errors.New(i18n.T("設定の読み書きができません", "cannot read or write the configuration"))
 	}
 	r, err := a.env.Store.Resolve(config.Overrides{
-		Profile:    a.g.profile,
-		BaseURL:    a.g.baseURL,
-		APIVersion: a.g.apiVersion,
-		ClientID:   a.g.clientID,
+		Profile:  a.g.profile,
+		BaseURL:  a.g.baseURL,
+		ClientID: a.g.clientID,
 	})
 	if err != nil {
 		return nil, err
 	}
+	if r.IgnoredAPIVersion != "" {
+		fmt.Fprintf(a.env.Err, i18n.T(
+			"注意: MTB_API_VERSION=%s は使いません。版はプロファイル %s のもの（%s）です。変えるなら mtb profile set --api-version\n",
+			"note: MTB_API_VERSION=%s is not used; the version comes from profile %s (%s). To change it: mtb profile set --api-version\n"),
+			r.IgnoredAPIVersion, r.Name, r.APIVersion)
+	}
 	a.resolved = r
 	return r, nil
+}
+
+// checkVersion は解決した版が使える形かを確かめます。resolve では見ません
+// ——そこで弾くと、壊れた版を mtb profile set で直すこともできなくなるためです。
+// 送る経路（client）と、送らずに組み立てる経路（runOperation）の両方から呼びます。
+func checkVersion(r *config.Resolved) error {
+	if config.VersionNumber(r.APIVersion) >= 1 {
+		return nil
+	}
+	if r.FromFile {
+		return usagef(i18n.T(
+			"プロファイル %s の Data API の版 %q は使えません（mtb profile set --api-version v3 のように v1〜v7 で直してください）",
+			"profile %s has an invalid Data API version %q (fix it with mtb profile set --api-version v3, using v1 to v7)"), r.Name, r.APIVersion)
+	}
+	return usagef(i18n.T(
+		"MTB_API_VERSION の値 %q は使えません（v1〜v7 の形で指定してください）",
+		"MTB_API_VERSION %q is not valid (give it as v1 to v7)"), r.APIVersion)
 }
 
 // storeTokens は解決済みプロファイルに紐づく認証情報の置き場です。
@@ -230,6 +256,9 @@ func (a *App) client() (*api.Client, error) {
 	}
 	r, err := a.resolve()
 	if err != nil {
+		return nil, err
+	}
+	if err := checkVersion(r); err != nil {
 		return nil, err
 	}
 

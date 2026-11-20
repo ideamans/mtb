@@ -58,6 +58,10 @@ func (a *App) newAssetReplacer(ctx context.Context, client *api.Client, siteID s
 		return nil, usagef("%s", i18n.T(
 			"--replace にはサイトIDが要ります", "--replace needs a site ID"))
 	}
+	// 同名のアセットを探して消すのに、アセットの一覧と削除（v2〜）を使います。
+	if err := a.requireAPI(http.MethodGet, "/sites/%s/assets"); err != nil {
+		return nil, err
+	}
 	resp, err := client.Do(ctx, api.Request{
 		Method: http.MethodGet,
 		Path:   "/sites/" + siteID,

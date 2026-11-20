@@ -655,6 +655,7 @@
           ],
           "summary": "Upload a file",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1assets~1upload/post",
+          "since": 2,
           "query": [
             {
               "name": "overwrite_once",
@@ -761,6 +762,7 @@
           ],
           "summary": "Create a new group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups/post",
+          "since": 2,
           "body": [
             {
               "name": "group",
@@ -793,6 +795,7 @@
           ],
           "summary": "Delete a group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -821,6 +824,7 @@
           ],
           "summary": "Retrieve single group by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -856,6 +860,7 @@
           ],
           "summary": "Retrieve a list of groups",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups/get",
+          "since": 2,
           "query": [
             {
               "name": "dateField",
@@ -942,6 +947,7 @@
             "Groups"
           ],
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1members/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -981,6 +987,7 @@
             "Groups"
           ],
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1members~1{member_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1018,6 +1025,7 @@
           ],
           "summary": "Retrieve single member by its ID for specified group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1members~1{member_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1062,6 +1070,7 @@
           ],
           "summary": "Retrieve a list of members for specified group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1members/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1160,6 +1169,7 @@
           ],
           "summary": "Grant permissions to group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1permissions~1grant/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1203,6 +1213,7 @@
           ],
           "summary": "Retrieve a list of permissions for group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1permissions/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1302,6 +1313,7 @@
           ],
           "summary": "Revoke permissions from group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}~1permissions~1revoke/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1342,7 +1354,8 @@
             "Groups"
           ],
           "summary": "Synchronize groups",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1synchronize/post"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1synchronize/post",
+          "since": 2
         }
       ]
     },
@@ -1361,6 +1374,7 @@
           ],
           "summary": "Update a group",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Groups/paths/~1groups~1{group_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "group_id",
@@ -1420,6 +1434,7 @@
           ],
           "summary": "Retrieve a list of permissions",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Permissions/paths/~1permissions/get",
+          "since": 2,
           "query": [
             {
               "name": "blogIds",
@@ -1507,6 +1522,7 @@
           ],
           "summary": "Disable a plugin",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1{plugin_id}~1disable/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "plugin_id",
@@ -1525,7 +1541,8 @@
             "Plugins"
           ],
           "summary": "Disable all plugins",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1disable/post"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1disable/post",
+          "since": 2
         }
       ]
     },
@@ -1544,6 +1561,7 @@
           ],
           "summary": "Enable a plugin",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1{plugin_id}~1enable/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "plugin_id",
@@ -1562,7 +1580,8 @@
             "Plugins"
           ],
           "summary": "Enable all plugins",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1enable/post"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1enable/post",
+          "since": 2
         }
       ]
     },
@@ -1581,6 +1600,7 @@
           ],
           "summary": "Retrieve single plugin by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins~1{plugin_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "plugin_id",
@@ -1608,7 +1628,8 @@
             "Plugins"
           ],
           "summary": "Retrieve a list of plugins in the specified site",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins/get"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Plugins/paths/~1plugins/get",
+          "since": 2
         }
       ]
     },
@@ -1628,6 +1649,7 @@
           ],
           "summary": "Publish Content Data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Data/paths/~1publish~1contentData/get",
+          "since": 4,
           "query": [
             {
               "name": "blogId",
@@ -1711,6 +1733,7 @@
           ],
           "summary": "Send the link for password recovery to specified email",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1recover_password/post",
+          "since": 2,
           "body": [
             {
               "name": "email",
@@ -1742,6 +1765,7 @@
           ],
           "summary": "Create a new role",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles/post",
+          "since": 2,
           "body": [
             {
               "name": "role",
@@ -1773,6 +1797,7 @@
           ],
           "summary": "Delete an existing role",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles~1{role_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "role_id",
@@ -1801,6 +1826,7 @@
           ],
           "summary": "Retrieve a single role by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles~1{role_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "role_id",
@@ -1836,6 +1862,7 @@
           ],
           "summary": "Retrieve a list of roles",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles/get",
+          "since": 2,
           "query": [
             {
               "name": "dateField",
@@ -1925,6 +1952,7 @@
           ],
           "summary": "Retrieve a list of permissions by role",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles~1{role_id}~1permissions/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "role_id",
@@ -2022,6 +2050,7 @@
           ],
           "summary": "Update an existing role",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Roles/paths/~1roles~1{role_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "role_id",
@@ -2062,6 +2091,7 @@
           ],
           "summary": "Searching entries/pages/content data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Search/paths/~1search/get",
+          "since": 2,
           "query": [
             {
               "name": "ExcludeBlogs",
@@ -2177,6 +2207,7 @@
           ],
           "summary": "Delete an asset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1assets~1{asset_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2216,6 +2247,7 @@
           ],
           "summary": "Retrieve a list of entries that related with specific asset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1assets~1{asset_id}~1entries/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2369,6 +2401,7 @@
           ],
           "summary": "Retrieve single asset by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1assets~1{asset_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2413,6 +2446,7 @@
           ],
           "summary": "Retrieve assets in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1assets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2531,6 +2565,7 @@
           ],
           "summary": "Retrieve a list of pages that related with specific asset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1assets~1{asset_id}~1pages/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2684,6 +2719,7 @@
           ],
           "summary": "Get thumbnail of an asset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1assets~1{asset_id}~1thumbnail/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2747,6 +2783,7 @@
           ],
           "summary": "Update an asset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1assets~1{asset_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2859,6 +2896,7 @@
           ],
           "summary": "Backup specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}~1backup/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2889,6 +2927,7 @@
           ],
           "summary": "Retrieve child categories from the specified category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}~1children/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2943,6 +2982,7 @@
           ],
           "summary": "Create a new category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -2987,6 +3027,7 @@
           ],
           "summary": "Delete an existing category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3026,6 +3067,7 @@
           ],
           "summary": "Retrieve a list of entries by specific category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1categories~1{category_id}~1entries/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3179,6 +3221,7 @@
           ],
           "summary": "Retrieve single category by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3342,6 +3385,7 @@
           ],
           "summary": "Retrieve parent categories from the specified category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}~1parents/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3396,6 +3440,7 @@
           ],
           "summary": "Rearrange existing categories in a new order",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1permutate/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3436,6 +3481,7 @@
           ],
           "summary": "Retrieve siblings categories from the specified category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}~1siblings/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3562,6 +3608,7 @@
           ],
           "summary": "Update an existing category",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categories~1{category_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -3617,6 +3664,7 @@
           ],
           "summary": "Category Collection of child categories for category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}~1children/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -3681,6 +3729,7 @@
           ],
           "summary": "Create a new category for category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -3735,6 +3784,7 @@
           ],
           "summary": "Delete single category in category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}/delete",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -3782,6 +3832,7 @@
           ],
           "summary": "Fetch single category in category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -3836,6 +3887,7 @@
           ],
           "summary": "Category Collection for category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -3943,6 +3995,7 @@
           ],
           "summary": "Category Collection of parent categories for category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}~1parents/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4007,6 +4060,7 @@
           ],
           "summary": "Save hierarchical categories order in category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1permutate/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4057,6 +4111,7 @@
           ],
           "summary": "Category Collection of sibling categories for category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}~1siblings/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4193,6 +4248,7 @@
           ],
           "summary": "Update single category in category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}~1categories~1{category_id}/put",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4253,6 +4309,7 @@
           ],
           "summary": "Create a new category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Category Sets/paths/~1sites~1{site_id}~1categorySets/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4293,6 +4350,7 @@
           ],
           "summary": "Delete category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Category Sets/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}/delete",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4330,6 +4388,7 @@
           ],
           "summary": "Fetch single category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Category Sets/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4374,6 +4433,7 @@
           ],
           "summary": "Category Set Collection",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Category Sets/paths/~1sites~1{site_id}~1categorySets/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4482,6 +4542,7 @@
           ],
           "summary": "Update category set",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Category Sets/paths/~1sites~1{site_id}~1categorySets~1{category_set_id}/put",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4530,6 +4591,7 @@
           ],
           "summary": "Retrieve sites by parent ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}~1children/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -4876,6 +4938,7 @@
           ],
           "summary": "Create Content Type",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4923,6 +4986,7 @@
           ],
           "summary": "Create Content Data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -4991,6 +5055,7 @@
           ],
           "summary": "Delete single content data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data~1{content_data_id}/delete",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5038,6 +5103,7 @@
           ],
           "summary": "Fetch single Content Data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data~1{content_data_id}/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5103,6 +5169,7 @@
           ],
           "summary": "Content Data Collection",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5231,6 +5298,7 @@
           ],
           "summary": "Make a preview by id",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data~1{content_data_id}~1preview/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5302,6 +5370,7 @@
           ],
           "summary": "Make a preview by data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data~1preview/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5376,6 +5445,7 @@
           ],
           "summary": "Update Content Data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1data~1{content_data_id}/put",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5450,6 +5520,7 @@
           ],
           "summary": "Delete Content Type",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}/delete",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5489,6 +5560,7 @@
           ],
           "summary": "Create Content Field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5542,6 +5614,7 @@
           ],
           "summary": "Delete Content Field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields~1{content_field_id}/delete",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5589,6 +5662,7 @@
           ],
           "summary": "Fetch single Content Field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields~1{content_field_id}/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5643,6 +5717,7 @@
           ],
           "summary": "Content Field Collection",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Fields/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5754,6 +5829,7 @@
           ],
           "summary": "Save hierarchical content field order",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields~1permutate/post",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5803,6 +5879,7 @@
           ],
           "summary": "Update Content Field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}~1fields~1{content_field_id}/put",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5862,6 +5939,7 @@
           ],
           "summary": "Fetch single Content Type",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -5906,6 +5984,7 @@
           ],
           "summary": "Content Type Collection",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes/get",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -6007,6 +6086,7 @@
           ],
           "summary": "Update Content Type",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Content Types/paths/~1sites~1{site_id}~1contentTypes~1{content_type_id}/put",
+          "since": 4,
           "pathParams": [
             {
               "name": "site_id",
@@ -6059,6 +6139,7 @@
           ],
           "summary": "Create a new website",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites/post",
+          "since": 2,
           "body": [
             {
               "name": "website",
@@ -6140,6 +6221,7 @@
           ],
           "summary": "Create a new blog",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -6229,6 +6311,7 @@
           ],
           "summary": "Delete an existing blog or website",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -6260,6 +6343,7 @@
           ],
           "summary": "Retrieve assets that related with specified entry",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1entries~1{entry_id}~1assets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -6371,6 +6455,7 @@
           ],
           "summary": "Retrieve categories in the specified entry",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Categories/paths/~1sites~1{site_id}~1entries~1{entry_id}~1categories/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -6831,6 +6916,7 @@
           ],
           "summary": "Export entries",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1entries~1export/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -6925,6 +7011,7 @@
           ],
           "summary": "Import entries",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1entries~1import/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7149,6 +7236,7 @@
           ],
           "summary": "Make a preview for a entry with existing data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1entries~1{entry_id}~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7223,6 +7311,7 @@
           ],
           "summary": "Make a preview for a entry",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1entries~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7384,6 +7473,7 @@
           ],
           "summary": "Export site's theme",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1sites~1{site_id}~1export_theme/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7495,6 +7585,7 @@
           ],
           "summary": "Create a new field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/CustomFields/paths/~1sites~1{site_id}~1fields/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7545,6 +7636,7 @@
           ],
           "summary": "Delete a field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/CustomFields/paths/~1sites~1{site_id}~1fields~1{field_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7582,6 +7674,7 @@
           ],
           "summary": "Retrieve single field by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/CustomFields/paths/~1sites~1{site_id}~1fields~1{field_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7626,6 +7719,7 @@
           ],
           "summary": "Retrieve a list of fields in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/CustomFields/paths/~1sites~1{site_id}~1fields/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7723,6 +7817,7 @@
           ],
           "summary": "Update a field",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/CustomFields/paths/~1sites~1{site_id}~1fields~1{field_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7782,6 +7877,7 @@
           ],
           "summary": "Retrieve a list of child folders of the requested folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}~1children/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7836,6 +7932,7 @@
           ],
           "summary": "Create a new folder.",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7880,6 +7977,7 @@
           ],
           "summary": "Delete an existing folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7917,6 +8015,7 @@
           ],
           "summary": "Retrieve single folder by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -7961,6 +8060,7 @@
           ],
           "summary": "Retrieve a list of folders",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8081,6 +8181,7 @@
           ],
           "summary": "Retrieve a list of pages by specific folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1folders~1{folder_id}~1pages/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8235,6 +8336,7 @@
           ],
           "summary": "Retrieve a list of parent folders of the requested folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}~1parents/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8289,6 +8391,7 @@
           ],
           "summary": "Rearrange existing folders in a new order",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1permutate/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8329,6 +8432,7 @@
           ],
           "summary": "Retrieve a list of sibling folders of the requested folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}~1siblings/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8455,6 +8559,7 @@
           ],
           "summary": "Update an existing folder",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Folders/paths/~1sites~1{site_id}~1folders~1{folder_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8507,6 +8612,7 @@
           ],
           "summary": "Create a new formatted_text",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/FormattedText/paths/~1sites~1{site_id}~1formatted_texts/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8549,6 +8655,7 @@
           ],
           "summary": "Delete a formatted_text",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/FormattedText/paths/~1sites~1{site_id}~1formatted_texts~1{formatted_text_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8586,6 +8693,7 @@
           ],
           "summary": "Retrieve single formatted_text by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/FormattedText/paths/~1sites~1{site_id}~1formatted_texts~1{formatted_text_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8630,6 +8738,7 @@
           ],
           "summary": "Retrieve a list of formatted_texts in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/FormattedText/paths/~1sites~1{site_id}~1formatted_texts/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8731,6 +8840,7 @@
           ],
           "summary": "Update a formatted_text",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/FormattedText/paths/~1sites~1{site_id}~1formatted_texts~1{formatted_text_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8815,6 +8925,7 @@
           ],
           "summary": "Retrieve sites",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites/get",
+          "since": 2,
           "query": [
             {
               "name": "dateField",
@@ -8909,6 +9020,7 @@
           ],
           "summary": "Create a new log",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8954,6 +9066,7 @@
           ],
           "summary": "Delete an existing log",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs~1{log_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -8991,6 +9104,7 @@
           ],
           "summary": "Export logs",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs~1export/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9029,6 +9143,7 @@
           ],
           "summary": "Retrieve a single log by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs~1{log_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9073,6 +9188,7 @@
           ],
           "summary": "Retrieve a list of logs in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9204,6 +9320,7 @@
           ],
           "summary": "Reset logs",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9233,6 +9350,7 @@
           ],
           "summary": "Update an existing log",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Logs/paths/~1sites~1{site_id}~1logs~1{log_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9288,6 +9406,7 @@
           ],
           "summary": "Retrieve assets that related with specified page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1pages~1{page_id}~1assets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9400,6 +9519,7 @@
           ],
           "summary": "Create a new comment on a page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Comments/paths/~1sites~1{site_id}~1pages~1{page_id}~1comments/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9453,6 +9573,7 @@
           ],
           "summary": "Retrieve a list of comments for the specified page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Comments/paths/~1sites~1{site_id}~1pages~1{page_id}~1comments/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9549,6 +9670,7 @@
           ],
           "summary": "Reply to specified comment",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Comments/paths/~1sites~1{site_id}~1pages~1{page_id}~1comments~1{comment_id}~1replies/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9608,6 +9730,7 @@
           ],
           "summary": "Create a new page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9681,6 +9804,7 @@
           ],
           "summary": "Delete an existing page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages~1{page_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9718,6 +9842,7 @@
           ],
           "summary": "Retrieve a single page by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages~1{page_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9773,6 +9898,7 @@
           ],
           "summary": "Retrieve a list of pages in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9918,6 +10044,7 @@
           ],
           "summary": "Make a preview for a page with existing data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages~1{page_id}~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -9990,6 +10117,7 @@
           ],
           "summary": "Make a preview for a page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10064,6 +10192,7 @@
           ],
           "summary": "Update an existing page",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1pages~1{page_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10146,6 +10275,7 @@
           ],
           "summary": "Grant permissions to site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}~1permissions~1grant/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10189,6 +10319,7 @@
           ],
           "summary": "Retrieve a list of permissions for site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}~1permissions/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10277,6 +10408,7 @@
           ],
           "summary": "Revoke permissions from site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}~1permissions~1revoke/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10318,6 +10450,7 @@
           ],
           "summary": "Reset all templates in the site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1refresh_templates/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -10431,6 +10564,7 @@
           ],
           "summary": "Retrieve screenPageViews count for each date from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1date~1screenPageViews/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -10501,6 +10635,7 @@
           ],
           "summary": "Retrieve sessions count for each date from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1date~1sessions/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -10693,6 +10828,7 @@
           ],
           "summary": "Retrieve screenPageViews count for each path from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1path~1screenPageViews/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -10763,6 +10899,7 @@
           ],
           "summary": "Retrieve sessions count for each path from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1path~1sessions/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -10912,6 +11049,7 @@
           ],
           "summary": "Retrieve screenPageViews count for each year from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1year~1screenPageViews/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -10982,6 +11120,7 @@
           ],
           "summary": "Retrieve sessions count for each year from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1year~1sessions/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -11043,6 +11182,7 @@
           ],
           "summary": "Retrieve screenPageViews count for each yearMonth from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1yearMonth~1screenPageViews/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -11113,6 +11253,7 @@
           ],
           "summary": "Retrieve sessions count for each yearMonth from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1yearMonth~1sessions/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -11174,6 +11315,7 @@
           ],
           "summary": "Retrieve screenPageViews count for each yearWeek from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1yearWeek~1screenPageViews/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -11244,6 +11386,7 @@
           ],
           "summary": "Retrieve sessions count for each yearWeek from provider (e.g. Google Analytics V4)",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Statistics/paths/~1sites~1{site_id}~1stats~1yearWeek~1sessions/get",
+          "since": 7,
           "pathParams": [
             {
               "name": "site_id",
@@ -11305,6 +11448,7 @@
           ],
           "summary": "Retrieve assets that related with specified tag",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Assets/paths/~1sites~1{site_id}~1tags~1{tag_id}~1assets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11415,6 +11559,7 @@
           ],
           "summary": "Delete an existing tag",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Tags/paths/~1sites~1{site_id}~1tags~1{tag_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11454,6 +11599,7 @@
           ],
           "summary": "Retrieve a list of entries that related with specific tag",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Entries/paths/~1sites~1{site_id}~1tags~1{tag_id}~1entries/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11607,6 +11753,7 @@
           ],
           "summary": "Retrieve a single tag by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Tags/paths/~1sites~1{site_id}~1tags~1{tag_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11651,6 +11798,7 @@
           ],
           "summary": "Retrieve a list of tags that related with specific site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Tags/paths/~1sites~1{site_id}~1tags/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11744,6 +11892,7 @@
           ],
           "summary": "Retrieve a list of pages that related with specific tag.",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Pages/paths/~1sites~1{site_id}~1tags~1{tag_id}~1pages/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11897,6 +12046,7 @@
           ],
           "summary": "Update an existing tag",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Tags/paths/~1sites~1{site_id}~1tags~1{tag_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11945,6 +12095,7 @@
           ],
           "summary": "Make a clone of a template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1clone/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -11982,6 +12133,7 @@
           ],
           "summary": "Create a new template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12041,6 +12193,7 @@
           ],
           "summary": "Delete a template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12078,6 +12231,7 @@
           ],
           "summary": "Retrieve single template by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12122,6 +12276,7 @@
           ],
           "summary": "Retrieve a list of templates in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12243,6 +12398,7 @@
           ],
           "summary": "Make a preview for a template with existing data",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12310,6 +12466,7 @@
           ],
           "summary": "Make a preview for a template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1preview/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12379,6 +12536,7 @@
           ],
           "summary": "Publish a template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1publish/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12416,6 +12574,7 @@
           ],
           "summary": "Reset template text to theme default or tempalte_set default",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1refresh/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12455,6 +12614,7 @@
           ],
           "summary": "Create a new templatemap",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1templatemaps/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12508,6 +12668,7 @@
           ],
           "summary": "Delete an existing templatemap",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1templatemaps~1{templatemap_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12555,6 +12716,7 @@
           ],
           "summary": "Retrieve a single templatemap by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1templatemaps~1{templatemap_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12602,6 +12764,7 @@
           ],
           "summary": "Retrieve a list of templatemaps in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1templatemaps/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12718,6 +12881,7 @@
           ],
           "summary": "Update an existing templatemap",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}~1templatemaps~1{templatemap_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12777,6 +12941,7 @@
           ],
           "summary": "Update a template",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Templates/paths/~1sites~1{site_id}~1templates~1{template_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12844,6 +13009,7 @@
           ],
           "summary": "Apply a theme to site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1sites~1{site_id}~1themes~1{theme_id}~1apply/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12881,6 +13047,7 @@
           ],
           "summary": "Retrieve a single theme by its ID for site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1sites~1{site_id}~1themes~1{theme_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12918,6 +13085,7 @@
           ],
           "summary": "Retrieve a list of themes for site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1sites~1{site_id}~1themes/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -12946,6 +13114,7 @@
           ],
           "summary": "Update an existing blog or website",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Sites/paths/~1sites~1{site_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13045,6 +13214,7 @@
           ],
           "summary": "Make a clone of a widget",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets~1{widget_id}~1clone/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13082,6 +13252,7 @@
           ],
           "summary": "Create a new widget",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13130,6 +13301,7 @@
           ],
           "summary": "Delete a widget",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets~1{widget_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13167,6 +13339,7 @@
           ],
           "summary": "Retrieve a single widget by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets~1{widget_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13211,6 +13384,7 @@
           ],
           "summary": "Retrieve a list of widgets in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13312,6 +13486,7 @@
           ],
           "summary": "Reset widget text to default",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets~1{widget_id}~1refresh/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13349,6 +13524,7 @@
           ],
           "summary": "Update a widget",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgets~1{widget_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13405,6 +13581,7 @@
           ],
           "summary": "Create a new widgetset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/WidgetSets/paths/~1sites~1{site_id}~1widgetsets/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13453,6 +13630,7 @@
           ],
           "summary": "Delete an existing widgetset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/WidgetSets/paths/~1sites~1{site_id}~1widgetsets~1{widgetset_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13490,6 +13668,7 @@
           ],
           "summary": "Retrieve a single widgetset by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/WidgetSets/paths/~1sites~1{site_id}~1widgetsets~1{widgetset_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13534,6 +13713,7 @@
           ],
           "summary": "Retrieve a list of widgetsets in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/WidgetSets/paths/~1sites~1{site_id}~1widgetsets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13635,6 +13815,7 @@
           ],
           "summary": "Update an existing widgetset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/WidgetSets/paths/~1sites~1{site_id}~1widgetsets~1{widgetset_id}/put",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13693,6 +13874,7 @@
           ],
           "summary": "Retrieve a single widget by widgetset ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgetsets~1{widgetset_id}~1widgets~1{widget_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13747,6 +13929,7 @@
           ],
           "summary": "Retrieve a list of widgets in the specified widgetset",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Widgets/paths/~1sites~1{site_id}~1widgetsets~1{widgetset_id}~1widgets/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "site_id",
@@ -13854,7 +14037,8 @@
             "System"
           ],
           "summary": "Retrieve a list of text filters",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/System/paths/~1textFilters/get"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/System/paths/~1textFilters/get",
+          "since": 5
         }
       ]
     },
@@ -13873,6 +14057,7 @@
           ],
           "summary": "Uninstall a specified theme from the MT",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1themes~1{theme_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "theme_id",
@@ -13901,6 +14086,7 @@
           ],
           "summary": "Retrieve a single theme by its ID",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1themes~1{theme_id}/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "theme_id",
@@ -13928,7 +14114,8 @@
             "Themes"
           ],
           "summary": "Retrieve a list of themes",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1themes/get"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Themes/paths/~1themes/get",
+          "since": 2
         }
       ]
     },
@@ -13947,6 +14134,7 @@
           ],
           "summary": "Create a new user",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users/post",
+          "since": 2,
           "body": [
             {
               "name": "user",
@@ -13989,6 +14177,7 @@
           ],
           "summary": "Delete user",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}/delete",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",
@@ -14016,7 +14205,8 @@
             "Users"
           ],
           "summary": "Export users",
-          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1export/get"
+          "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1export/get",
+          "since": 2
         }
       ]
     },
@@ -14072,6 +14262,7 @@
           ],
           "summary": "Retrieve a list of groups",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}~1groups/get",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",
@@ -14168,6 +14359,7 @@
           ],
           "summary": "Import users",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1import/post",
+          "since": 2,
           "body": [
             {
               "name": "file",
@@ -14194,6 +14386,7 @@
           ],
           "summary": "Retrieve a list of users in the specified site",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users/get",
+          "since": 2,
           "query": [
             {
               "name": "dateField",
@@ -14315,6 +14508,7 @@
           ],
           "summary": "Grant permissions to user",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}~1permissions~1grant/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",
@@ -14457,6 +14651,7 @@
           ],
           "summary": "Revoke permissions from user",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}~1permissions~1revoke/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",
@@ -14498,6 +14693,7 @@
           ],
           "summary": "Send the link for password recovery to specified user by email",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}~1recover_password/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",
@@ -14635,6 +14831,7 @@
           ],
           "summary": "Unlock user account",
           "docUrl": "https://movabletype.github.io/mt-docs-data-api-reference/v7.html#tag/Users/paths/~1users~1{user_id}~1unlock/post",
+          "since": 2,
           "pathParams": [
             {
               "name": "user_id",

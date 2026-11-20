@@ -19,8 +19,10 @@ const authHeader = "X-MT-Authorization"
 type tokenResponse struct {
 	AccessToken string `json:"accessToken"`
 	SessionID   string `json:"sessionId"`
-	ExpiresIn   int64  `json:"expiresIn"`
-	Remember    bool   `json:"remember"`
+	// ExpiresIn は MT 6 では文字列（"3600"）で来る。数値として読むと
+	// サインインそのものが失敗するので、どちらも読む。
+	ExpiresIn flexInt `json:"expiresIn"`
+	Remember  bool    `json:"remember"`
 }
 
 // Login はユーザー名とパスワードでセッションとアクセストークンを作ります。
@@ -55,6 +57,11 @@ func (c *Client) Login(ctx context.Context, username, password string, remember 
 	if resp.Status >= 400 {
 		e := newError(http.MethodPost, c.URL("/authentication", nil), resp)
 		if e.Unauthorized() {
+			if config.UsesSignInPassword(c.APIVersion) {
+				return nil, fmt.Errorf(i18n.T(
+					"%w（Data API %s ではサインインのパスワードを使います。Webサービスパスワードではありません）",
+					"%w (Data API %s takes the sign-in password, not the Web Services Password)"), e, c.APIVersion)
+			}
 			return nil, fmt.Errorf(i18n.T(
 				"%w（Webサービスパスワードを使っているか確認してください。MT のサインインパスワードとは別です）",
 				"%w (check that you are using the Web Services Password, which is not the Movable Type sign-in password)"), e)
@@ -79,7 +86,7 @@ func (c *Client) Login(ctx context.Context, username, password string, remember 
 		Username:    username,
 	}
 	if tr.ExpiresIn > 0 {
-		cred.ExpiresAt = c.now().Add(time.Duration(tr.ExpiresIn) * time.Second).Unix()
+		cred.ExpiresAt = c.now().Add(time.Duration(int64(tr.ExpiresIn)) * time.Second).Unix()
 	}
 	if err := c.tokens().Save(cred); err != nil {
 		return nil, err
@@ -133,7 +140,7 @@ func (c *Client) Refresh(ctx context.Context) (*config.Credential, error) {
 	}
 	updated.ExpiresAt = 0
 	if tr.ExpiresIn > 0 {
-		updated.ExpiresAt = c.now().Add(time.Duration(tr.ExpiresIn) * time.Second).Unix()
+		updated.ExpiresAt = c.now().Add(time.Duration(int64(tr.ExpiresIn)) * time.Second).Unix()
 	}
 	if err := c.tokens().Save(&updated); err != nil {
 		return nil, err

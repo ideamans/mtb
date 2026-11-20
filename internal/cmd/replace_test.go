@@ -110,3 +110,27 @@ func TestThemeApplyIsGuarded(t *testing.T) {
 		}
 	}
 }
+
+// サイトIDがパスにあるアップロード（POST /sites/{site_id}/assets/upload）でも
+// --replace が効くこと。本文の site_id しか見ておらず「サイトIDが要ります」で
+// 止まっていた（MT 6.2.2 で試して見つけた）。
+func TestReplaceWithSiteIDInPath(t *testing.T) {
+	h := newHarness(t)
+	h.files["dist/theme.css"] = "body{}"
+	h.reply(
+		okJSON(`{"url":"http://example.com/blog/"}`),
+		okJSON(`{"items":[{"id":38,"url":"http://example.com/blog/theme-assets/theme.css"}]}`),
+		okJSON(`{"id":"38"}`),
+		okJSON(`{"id":"41"}`),
+	)
+
+	h.mustRun("sites", "assets", "upload", "4", "--file", "dist/theme.css",
+		"--path", "/theme-assets", "--replace", "--yes")
+
+	if got := h.doer.sent[2]; got.Method != "DELETE" || !strings.HasSuffix(got.URL, "/sites/4/assets/38") {
+		t.Errorf("削除していません: %s %s", got.Method, got.URL)
+	}
+	if got := h.doer.sent[3]; !strings.Contains(got.URL, "/sites/4/assets/upload") {
+		t.Errorf("送信先 = %s", got.URL)
+	}
+}

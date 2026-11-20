@@ -26,12 +26,17 @@ const (
 // addGeneratedCommands は埋め込んだ API 定義からコマンドツリーを作ります。
 func (a *App) addGeneratedCommands() {
 	groups := map[string]*cobra.Command{}
+	since := groupSince(a.env.Spec)
 
 	// Groups は名前順に並んでいるので、親が必ず子より先に来ます。
 	for _, g := range a.env.Spec.Groups {
+		short := groupShort(g)
+		if v := since[strings.Join(g.Command, " ")]; v >= markedSince {
+			short = fmt.Sprintf("%s [v%d+]", short, v)
+		}
 		c := &cobra.Command{
 			Use:     g.Command[len(g.Command)-1],
-			Short:   groupShort(g),
+			Short:   short,
 			Aliases: aliasesFor(g.Command[len(g.Command)-1]),
 		}
 		groups[strings.Join(g.Command, " ")] = c
@@ -57,6 +62,22 @@ func (a *App) attach(groups map[string]*cobra.Command, path []string, c *cobra.C
 		return
 	}
 	parent.AddCommand(c)
+}
+
+// groupSince は、グループ配下でいちばん早く使える版です。配下が全部
+// v4 からならグループにも印を付けます（コンテンツタイプ・カテゴリセットなど）。
+func groupSince(s *spec.Spec) map[string]int {
+	out := map[string]int{}
+	for _, c := range s.Commands {
+		v := commandSince(c)
+		for i := 1; i < len(c.Command); i++ {
+			key := strings.Join(c.Command[:i], " ")
+			if cur, ok := out[key]; !ok || v < cur {
+				out[key] = v
+			}
+		}
+	}
+	return out
 }
 
 func groupShort(g *spec.Group) string {
@@ -86,7 +107,7 @@ func (a *App) newOperationCmd(sc *spec.Command) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     usageLine(sc.Name(), canonical),
-		Short:   sc.Short,
+		Short:   shortWithSince(sc),
 		Long:    longDescription(sc, canonical),
 		Args:    cobra.MaximumNArgs(len(canonical)),
 		RunE:    func(cmd *cobra.Command, args []string) error { return a.runOperation(cmd, sc, args) },
@@ -239,12 +260,43 @@ func flagUsage(p *spec.Param) string {
 	return b.String()
 }
 
+// markedSince は、コマンドの題名に版の印を付ける境目です。v2 と v3 は
+// 使える操作が同じで、v1（MT 6.0）だけが極端に少ない（29 操作）ので、
+// v2 からの 150 余りに印を付けると一覧が印だらけになります。MT 7 で
+// 入ったもの（コンテンツタイプなど）から印を付け、細かい版は --help に出します。
+const markedSince = 4
+
+// shortWithSince は題名に「[v4+]」の印を足します。複数の操作を畳んだ
+// コマンドでは、いちばん早く使える版で判断します。
+func shortWithSince(sc *spec.Command) string {
+	since := commandSince(sc)
+	if since < markedSince {
+		return sc.Short
+	}
+	return fmt.Sprintf("%s [v%d+]", sc.Short, since)
+}
+
+func commandSince(sc *spec.Command) int {
+	since := sc.Ops[0].Since
+	for _, op := range sc.Ops[1:] {
+		if op.Since < since {
+			since = op.Since
+		}
+	}
+	return since
+}
+
 func longDescription(sc *spec.Command, canonical []*spec.Param) string {
 	var b strings.Builder
 	b.WriteString(sc.Short)
 	b.WriteString("\n")
 	for _, op := range sc.Ops {
 		fmt.Fprintf(&b, "\n%s %s\n", op.Method, op.Path)
+		if op.Since > 1 {
+			fmt.Fprintf(&b, i18n.T(
+				"（Data API v%d 以降。接続先の版が足りなければ送らずに止めます）\n",
+				"(Data API v%d or later; mtb stops before sending if the target's version is lower)\n"), op.Since)
+		}
 		if op.Deprecated {
 			b.WriteString(i18n.T("（このエンドポイントは非推奨です）\n", "(this endpoint is deprecated)\n"))
 		}

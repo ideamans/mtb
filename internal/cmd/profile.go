@@ -1,10 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/prompt"
 	"io"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -95,28 +99,40 @@ func (a *App) writeProfileTable(out io.Writer, f *config.File) error {
 
 func (a *App) newProfileAddCmd() *cobra.Command {
 	var (
-		username string
-		siteID   string
-		use      bool
+		username   string
+		apiVersion string
+		siteID     string
+		use        bool
 	)
 	cmd := &cobra.Command{
 		Use:   i18n.T("add <名前>", "add <name>"),
 		Short: i18n.T("プロファイルを追加する", "Add a profile"),
 		Long: i18n.T(
 			"接続先を登録します。--base-url は mt-data-api.cgi までの URL です。\n"+
-				"末尾に /v7 が付いていても取り除いて解釈します。\n\n"+
+				"末尾に /v7 などの版が付いていたら、取り除いてその版を使います。\n"+
+				"Data API の版はプロファイルに紐づきます。--api-version を省くと、サーバに\n"+
+				"v7 から v1 へ順に問い合わせ（GET /vN/endpoints。サインイン不要）、通った\n"+
+				"いちばん新しい版を既定にします。対話できればその版を選んだ一覧が出ます。\n"+
+				"調べられなければ v7 で登録します（MT 6.2 は v3。版が足りない操作は、\n"+
+				"送る前に mtb が止めます）。コマンドごとに版を変える手段はありません。\n\n"+
 				"名前は省けます。省くと、いまあるプロファイルを一覧してから\n"+
 				"名前と URL を聞きます（対話できない場面ではエラーになります）。\n\n"+
 				"登録できたら、そのままサインインするか聞きます。\n\n"+
-				"--base-url / --api-version / --client-id / --insecure は共通フラグを使います。\n\n"+
+				"--base-url / --client-id / --insecure は共通フラグを使います。\n\n"+
 				"例: mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi",
 			"Register a server. --base-url is the URL up to mt-data-api.cgi.\n"+
-				"A trailing /v7 is stripped before it is stored.\n\n"+
+				"A trailing version such as /v7 is stripped and that version is used.\n"+
+				"The Data API version belongs to the profile. Without --api-version, the server is\n"+
+				"asked from v7 down to v1 (GET /vN/endpoints, no sign-in needed) and the newest\n"+
+				"version that answers becomes the default; on a terminal you pick from a list with\n"+
+				"it preselected. If it cannot be checked, v7 is used (MT 6.2 speaks v3; mtb stops\n"+
+				"operations the version lacks before sending them). There is no way to change it\n"+
+				"per command.\n\n"+
 				"The name is optional. Leave it off and the existing profiles are listed,\n"+
 				"then you are asked for the name and the URL (where there is no terminal\n"+
 				"to prompt on, this is an error instead).\n\n"+
 				"Once it is registered you are asked whether to sign in straight away.\n\n"+
-				"--base-url / --api-version / --client-id / --insecure are the global flags.\n\n"+
+				"--base-url / --client-id / --insecure are the global flags.\n\n"+
 				"Example: mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi"),
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -156,7 +172,16 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 					"接続先の URL が要ります（--base-url でも指定できます）",
 					"the connection URL is required (you can also pass --base-url)"))
 			}
-			base, version := config.NormalizeBaseURL(baseURL, a.g.apiVersion)
+			base, version := config.NormalizeBaseURL(baseURL, apiVersion)
+			if apiVersion == "" && !urlHasVersion(baseURL) {
+				// 版を指定されていなければ、サーバに聞いて決めます。
+				if version, err = a.decideVersion(cmd.Context(), base); err != nil {
+					return err
+				}
+			}
+			if config.VersionNumber(version) < 1 {
+				return invalidVersion(version)
+			}
 			f.Profiles[name] = &config.Profile{
 				BaseURL:            base,
 				APIVersion:         version,
@@ -182,6 +207,7 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
+	f.StringVar(&apiVersion, "api-version", "", i18n.T("Data API の版 v1〜v7（省くとサーバに問い合わせて決める。MT 6.2 は v3）", "Data API version v1 to v7 (leave it off to ask the server; MT 6.2 speaks v3)"))
 	f.StringVar(&username, "username", "", i18n.T("サインイン名（サインイン時の入力を省くため）", "sign-in name (so you are not asked for it at sign-in)"))
 	f.StringVar(&siteID, "site-id", "", i18n.T("既定のサイトID", "default site ID"))
 	f.BoolVar(&use, "use", false, i18n.T("追加したプロファイルを既定にする", "make the new profile the default"))
@@ -190,8 +216,9 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 
 func (a *App) newProfileSetCmd() *cobra.Command {
 	var (
-		username string
-		siteID   string
+		username   string
+		apiVersion string
+		siteID     string
 	)
 	cmd := &cobra.Command{
 		Use:   "set",
@@ -199,10 +226,12 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 		Long: i18n.T(
 			"--profile を付けなければ既定のプロファイルを変更します。\n"+
 				"指定したフラグだけを書き換えます。\n\n"+
-				"--base-url / --api-version / --client-id / --insecure は共通フラグを使います。",
+				"--base-url / --client-id / --insecure は共通フラグを使います。\n"+
+				"Data API の版を変えるのは --api-version です（版はプロファイルにだけ持たせます）。",
 			"Without --profile this changes the default profile.\n"+
 				"Only the flags you pass are rewritten.\n\n"+
-				"--base-url / --api-version / --client-id / --insecure are the global flags."),
+				"--base-url / --client-id / --insecure are the global flags.\n"+
+				"Change the Data API version with --api-version (only profiles carry it)."),
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			r, err := a.resolve()
@@ -214,6 +243,9 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 					"設定ファイルにプロファイルがありません。mtb profile add で作ってください",
 					"the configuration file has no profiles; create one with mtb profile add"))
 			}
+			if cmd.Flags().Changed("api-version") && config.VersionNumber(apiVersion) < 1 {
+				return invalidVersion(apiVersion)
+			}
 			changed := false
 			err = a.updateProfile(r.Name, func(p *config.Profile) {
 				if cmd.Flags().Changed("base-url") {
@@ -221,7 +253,7 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 					changed = true
 				}
 				if cmd.Flags().Changed("api-version") {
-					p.APIVersion = a.g.apiVersion
+					p.APIVersion = apiVersion
 					changed = true
 				}
 				if cmd.Flags().Changed("client-id") {
@@ -254,6 +286,7 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
+	f.StringVar(&apiVersion, "api-version", "", i18n.T("Data API の版 v1〜v7（MT 6.2 は v3）", "Data API version v1 to v7 (MT 6.2 speaks v3)"))
 	f.StringVar(&username, "username", "", i18n.T("サインイン名", "sign-in name"))
 	f.StringVar(&siteID, "site-id", "", i18n.T("既定のサイトID", "default site ID"))
 	return cmd
@@ -302,7 +335,7 @@ func (a *App) newProfileShowCmd() *cobra.Command {
 			w := tabwriter.NewWriter(a.env.Out, 0, 0, 2, ' ', 0)
 			fmt.Fprintf(w, i18n.T("プロファイル\t%s\n", "Profile\t%s\n"), r.Name)
 			fmt.Fprintf(w, i18n.T("ベースURL\t%s\n", "Base URL\t%s\n"), r.BaseURL)
-			fmt.Fprintf(w, i18n.T("APIバージョン\t%s\n", "API version\t%s\n"), r.APIVersion)
+			fmt.Fprintf(w, i18n.T("APIバージョン\t%s\n", "API version\t%s\n"), config.DescribeVersion(r.APIVersion))
 			fmt.Fprintf(w, i18n.T("クライアントID\t%s\n", "Client ID\t%s\n"), r.ClientID)
 			fmt.Fprintf(w, i18n.T("既定サイトID\t%s\n", "Default site ID\t%s\n"), dash(r.SiteID))
 			fmt.Fprintf(w, i18n.T("ユーザー名\t%s\n", "Username\t%s\n"), dash(r.Username))
@@ -374,6 +407,70 @@ func (a *App) updateProfile(name string, mutate func(*config.Profile)) error {
 	}
 	mutate(p)
 	return a.env.Store.Save(f)
+}
+
+// urlHasVersion は URL の末尾に /v3 のような版が付いているかです。
+func urlHasVersion(u string) bool {
+	u = strings.TrimRight(strings.TrimSpace(u), "/")
+	i := strings.LastIndex(u, "/")
+	return i >= 0 && config.VersionNumber(u[i+1:]) >= 1
+}
+
+// decideVersion は、版を指定されずにプロファイルを足すときの版を決めます。
+//
+// サーバに v7 から v1 へ順に問い合わせ、通ったいちばん新しい版を既定にします。
+// 対話できればその版を選んだ状態で一覧を見せ（古い版に下げることもできる）、
+// 対話できなければそのまま使います。**調べられなくても登録は止めません**
+// ——手元からまだ届かないサーバを先に登録することもあるためです。その場合は
+// v7 にして、あとで直せることを伝えます。
+func (a *App) decideVersion(ctx context.Context, base string) (string, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	latest := config.VersionNumber(config.DefaultAPIVersion)
+	probe := &api.Client{
+		BaseURL:   base,
+		ClientID:  firstNonEmptyString(a.g.clientID, config.DefaultClientID),
+		HTTP:      a.env.NewDoer(a.g.insecure, a.g.timeout),
+		Now:       a.env.now,
+		UserAgent: "mtb/" + Version,
+	}
+	if a.g.verbose {
+		probe.Trace = a.env.Err
+	}
+	fmt.Fprintln(a.env.Err, i18n.T("Data API の版を調べています…", "Checking which Data API versions the server speaks..."))
+	detected, err := probe.DetectVersion(ctx, latest)
+
+	top := latest
+	if err == nil {
+		top = detected
+		fmt.Fprintf(a.env.Err, i18n.T("このサーバは Data API %s まで使えます\n", "This server speaks Data API up to %s\n"),
+			config.DescribeVersion(fmt.Sprintf("v%d", detected)))
+	} else {
+		fmt.Fprintf(a.env.Err, i18n.T(
+			"版を調べられませんでした: %v\n%s として登録します。あとで mtb profile set --api-version で直せます\n",
+			"Could not check the version: %v\nRegistering it as %s; fix it later with mtb profile set --api-version\n"),
+			err, config.DefaultAPIVersion)
+	}
+	def := fmt.Sprintf("v%d", top)
+	if a.env.Prompt == nil || !a.env.Prompt.Interactive() {
+		return def, nil
+	}
+
+	options := make([]prompt.Option, 0, top)
+	for v := top; v >= 1; v-- {
+		value := fmt.Sprintf("v%d", v)
+		label := config.DescribeVersion(value)
+		if v == top {
+			if err == nil {
+				label += i18n.T(" ← このサーバの最新", " ← the newest this server speaks")
+			} else {
+				label += i18n.T(" ← 既定", " ← default")
+			}
+		}
+		options = append(options, prompt.Option{Value: value, Label: label})
+	}
+	return a.env.Prompt.Select(i18n.T("Data API の版", "Data API version"), options, def)
 }
 
 // offerSignIn は追加したプロファイルで、そのままサインインするか聞きます。
@@ -451,4 +548,10 @@ func joinNames(names []string) string {
 		out += n
 	}
 	return out
+}
+
+func invalidVersion(v string) error {
+	return usagef(i18n.T(
+		"Data API の版 %q は使えません（v1〜v7 の形で指定してください）",
+		"Data API version %q is not valid (give it as v1 to v7)"), v)
 }

@@ -5,13 +5,13 @@
 package prompt
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/huh"
 	"golang.org/x/term"
 
 	"github.com/ideamans/mtb/internal/i18n"
@@ -30,18 +30,33 @@ type Prompter interface {
 	Secret(label string) (string, error)
 	// Confirm は yes/no を読みます。
 	Confirm(label string, def bool) (bool, error)
+	// Select は選択肢から1つを選ばせます。def は最初に選ばれている値です。
+	Select(label string, options []Option, def string) (string, error)
 	// Interactive は対話できる状況かを返します。
 	Interactive() bool
 }
 
+// Option は Select の選択肢1つです。
+type Option struct {
+	// Value は選んだときに返る値です。
+	Value string
+	// Label は画面に出す文言です。
+	Label string
+}
+
+// ErrAborted は入力の途中で Ctrl+C などで抜けたときのエラーです。
+var ErrAborted = i18n.Error("中止しました", "aborted")
+
 // Terminal は実際の端末から読む実装です。
+//
+// 入力欄は charmbracelet/huh で描きます。素の1行読みでは矢印キーが
+// エスケープ列（^[[D）のまま入り、既定値を少し直すこともできなかったためです。
+// huh なら行の編集・既定値の書き換え・選択肢からの選択ができます。
 type Terminal struct {
 	In  io.Reader
 	Out io.Writer
-	// Fd は端末判定とエコー抑止に使うファイルディスクリプタです。
+	// Fd は端末判定に使うファイルディスクリプタです。
 	Fd int
-
-	reader *bufio.Reader
 }
 
 // NewTerminal は標準入出力を使う Prompter を作ります。
@@ -56,55 +71,89 @@ func NewTerminal(in io.Reader, out io.Writer) *Terminal {
 // Interactive は入力が端末かどうかです。
 func (t *Terminal) Interactive() bool { return t.Fd >= 0 && term.IsTerminal(t.Fd) }
 
-// Line は1行を読みます。
-func (t *Terminal) Line(label, def string) (string, error) {
+// run は1項目だけのフォームを動かします。
+func (t *Terminal) run(label string, field huh.Field) error {
 	if !t.Interactive() {
-		return "", fmt.Errorf("%w: %s", ErrNotInteractive, label)
+		return fmt.Errorf("%w: %s", ErrNotInteractive, label)
 	}
-	if def != "" {
-		fmt.Fprintf(t.Out, "%s [%s]: ", label, def)
-	} else {
-		fmt.Fprintf(t.Out, "%s: ", label)
+	err := huh.NewForm(huh.NewGroup(field)).
+		WithInput(t.In).
+		WithOutput(t.Out).
+		WithTheme(huh.ThemeBase()).
+		Run()
+	if errors.Is(err, huh.ErrUserAborted) {
+		return ErrAborted
 	}
-	if t.reader == nil {
-		t.reader = bufio.NewReader(t.In)
-	}
-	line, err := t.reader.ReadString('\n')
-	if err != nil && (line == "" || !errors.Is(err, io.EOF)) {
+	return err
+}
+
+// echo は答えを1行残します。huh は確定したフォームを画面から消すので、
+// 残さないと「どの URL で登録したか・どの版を選んだか」が後から見えません。
+func (t *Terminal) echo(label, value string) {
+	fmt.Fprintf(t.Out, "✔ %s: %s\n", label, value)
+}
+
+// Line は1行を読みます。既定値は入力欄に最初から入っていて、そのまま
+// 確定することも、書き換えることもできます。
+func (t *Terminal) Line(label, def string) (string, error) {
+	value := def
+	if err := t.run(label, huh.NewInput().Title(label).Value(&value)); err != nil {
 		return "", err
 	}
-	line = strings.TrimSpace(line)
-	if line == "" {
-		return def, nil
+	value = strings.TrimSpace(value)
+	if value == "" {
+		value = def
 	}
-	return line, nil
+	t.echo(label, value)
+	return value, nil
 }
 
 // Secret はエコーせずに1行を読みます。
 func (t *Terminal) Secret(label string) (string, error) {
-	if !t.Interactive() {
-		return "", fmt.Errorf("%w: %s", ErrNotInteractive, label)
-	}
-	fmt.Fprintf(t.Out, "%s: ", label)
-	buf, err := term.ReadPassword(t.Fd)
-	fmt.Fprintln(t.Out)
-	if err != nil {
+	var value string
+	if err := t.run(label, huh.NewInput().Title(label).EchoMode(huh.EchoModePassword).Value(&value)); err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(string(buf)), nil
+	t.echo(label, "********")
+	return strings.TrimSpace(value), nil
 }
 
 // Confirm は yes/no を読みます。
 func (t *Terminal) Confirm(label string, def bool) (bool, error) {
-	hint := "y/N"
-	if def {
-		hint = "Y/n"
-	}
-	answer, err := t.Line(fmt.Sprintf("%s (%s)", label, hint), "")
-	if err != nil {
+	value := def
+	field := huh.NewConfirm().Title(label).
+		Affirmative(i18n.T("はい", "Yes")).
+		Negative(i18n.T("いいえ", "No")).
+		Value(&value)
+	if err := t.run(label, field); err != nil {
 		return false, err
 	}
-	return parseYesNo(answer, def), nil
+	answer := i18n.T("いいえ", "No")
+	if value {
+		answer = i18n.T("はい", "Yes")
+	}
+	t.echo(label, answer)
+	return value, nil
+}
+
+// Select は選択肢から1つを選ばせます。def の選択肢にカーソルを置いて始めます。
+func (t *Terminal) Select(label string, options []Option, def string) (string, error) {
+	value := def
+	opts := make([]huh.Option[string], len(options))
+	for i, o := range options {
+		opts[i] = huh.NewOption(o.Label, o.Value)
+	}
+	if err := t.run(label, huh.NewSelect[string]().Title(label).Options(opts...).Value(&value)); err != nil {
+		return "", err
+	}
+	shown := value
+	for _, o := range options {
+		if o.Value == value {
+			shown = o.Label
+		}
+	}
+	t.echo(label, shown)
+	return value, nil
 }
 
 // Scripted は答えをあらかじめ積んでおく実装です。テスト用です。
@@ -115,6 +164,8 @@ type Scripted struct {
 	Secrets []string
 	// Confirms は Confirm が順に返す答えです。
 	Confirms []bool
+	// Selects は Select が順に返す答えです。尽きたら既定値を返します。
+	Selects []string
 	// NotInteractive を立てると Interactive が false になり、入力要求は
 	// ErrNotInteractive になります。
 	NotInteractive bool
@@ -170,13 +221,22 @@ func (s *Scripted) Confirm(label string, def bool) (bool, error) {
 	return answer, nil
 }
 
-func parseYesNo(s string, def bool) bool {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "y", "yes":
-		return true
-	case "n", "no":
-		return false
-	default:
-		return def
+// Select は積んである答えを順に返します。選択肢に無い答えはエラーにします
+// （本物の端末では選べないので、テストの書き間違いです）。
+func (s *Scripted) Select(label string, options []Option, def string) (string, error) {
+	s.Asked = append(s.Asked, label)
+	if s.NotInteractive {
+		return "", fmt.Errorf("%w: %s", ErrNotInteractive, label)
 	}
+	if len(s.Selects) == 0 {
+		return def, nil
+	}
+	answer := s.Selects[0]
+	s.Selects = s.Selects[1:]
+	for _, o := range options {
+		if o.Value == answer {
+			return answer, nil
+		}
+	}
+	return "", fmt.Errorf("prompt.Scripted: %q is not among the options", answer)
 }

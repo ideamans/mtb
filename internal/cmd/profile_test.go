@@ -317,7 +317,8 @@ func TestProfileAddOffersSignIn(t *testing.T) {
 	h.prompt.Confirms = []bool{true}
 	h.reply(okJSON(`{"accessToken":"token-1","sessionId":"session-1","expiresIn":3600}`))
 
-	out := h.mustRun("profile", "add", "prod", "--base-url", "https://example.com/mt-data-api.cgi")
+	// 版を渡して自動判定を飛ばす（ここで見たいのはサインインの流れ）
+	out := h.mustRun("profile", "add", "prod", "--base-url", "https://example.com/mt-data-api.cgi", "--api-version", "v7")
 
 	if !contains(h.prompt.Asked, "このままサインインしますか？") {
 		t.Errorf("サインインするか聞いていません: %v", h.prompt.Asked)
@@ -344,7 +345,7 @@ func TestProfileAddSignInDeclined(t *testing.T) {
 	h.prompt.NotInteractive = false
 	h.prompt.Confirms = []bool{false}
 
-	out := h.mustRun("profile", "add", "prod", "--base-url", "https://example.com/mt-data-api.cgi")
+	out := h.mustRun("profile", "add", "prod", "--base-url", "https://example.com/mt-data-api.cgi", "--api-version", "v7")
 
 	if len(h.doer.sent) != 0 {
 		t.Error("断ったのにサインインしています")

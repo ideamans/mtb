@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -526,4 +527,65 @@ func TestArrayItemEnumIsCarried(t *testing.T) {
 		}
 	}
 	t.Fatal("export_theme の include が見つかりません")
+}
+
+// v1〜v6 の定義を突き合わせ、各操作が使える最初の版を付けること。
+// v1 にあるもの（記事の一覧）は 0、v2 からのもの（記事の作成）は 2、
+// どの旧版にも無いもの（フォルダの並べ替え）は 7。
+func TestRunAnnotatesSince(t *testing.T) {
+	dir := t.TempDir()
+	in := filepath.Join(dir, "openapi.json")
+	out := filepath.Join(dir, "spec.json")
+	older := filepath.Join(dir, "older")
+	if err := os.WriteFile(in, []byte(fixtureOpenAPI), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(older, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	versions := map[int]string{
+		1: `{"paths":{"/sites/{site_id}/entries":{"get":{}}}}`,
+		2: `{"paths":{"/sites/{site_id}/entries":{"get":{},"post":{}}}}`,
+	}
+	for v := 1; v <= 6; v++ {
+		body, ok := versions[v]
+		if !ok {
+			body = versions[2]
+		}
+		if err := os.WriteFile(filepath.Join(older, fmt.Sprintf("v%d.json", v)), []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	oldIn, oldOut, oldOlder := *inPath, *outPath, *olderDir
+	*inPath, *outPath, *olderDir = in, out, older
+	defer func() { *inPath, *outPath, *olderDir = oldIn, oldOut, oldOlder }()
+
+	if err := run(); err != nil {
+		t.Fatal(err)
+	}
+	buf, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var s spec.Spec
+	if err := json.Unmarshal(buf, &s); err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]int{
+		"GET /sites/{site_id}/entries":            0,
+		"POST /sites/{site_id}/entries":           2,
+		"POST /sites/{site_id}/folders/permutate": 7,
+	}
+	for key, since := range want {
+		method, path, _ := strings.Cut(key, " ")
+		op := s.Find(method, path)
+		if op == nil {
+			t.Errorf("%s がありません", key)
+			continue
+		}
+		if op.Since != since {
+			t.Errorf("%s: since = %d, want %d", key, op.Since, since)
+		}
+	}
 }

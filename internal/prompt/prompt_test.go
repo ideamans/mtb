@@ -22,26 +22,22 @@ func TestTerminalWithoutTTY(t *testing.T) {
 	if _, err := term.Confirm("消しますか", false); !errors.Is(err, ErrNotInteractive) {
 		t.Errorf("Confirm err = %v", err)
 	}
+	if _, err := term.Select("版", []Option{{Value: "v7", Label: "v7"}}, "v7"); !errors.Is(err, ErrNotInteractive) {
+		t.Errorf("Select err = %v", err)
+	}
 }
 
-func TestParseYesNo(t *testing.T) {
-	tests := []struct {
-		in  string
-		def bool
-		out bool
-	}{
-		{"y", false, true},
-		{"Yes", false, true},
-		{"n", true, false},
-		{"NO", true, false},
-		{"", true, true},
-		{"", false, false},
-		{"わからない", false, false},
+func TestScriptedSelect(t *testing.T) {
+	opts := []Option{{Value: "v3", Label: "v3"}, {Value: "v7", Label: "v7"}}
+	s := &Scripted{Selects: []string{"v3", "v9"}}
+	if got, _ := s.Select("版", opts, "v7"); got != "v3" {
+		t.Errorf("Select = %q", got)
 	}
-	for _, tt := range tests {
-		if got := parseYesNo(tt.in, tt.def); got != tt.out {
-			t.Errorf("parseYesNo(%q, %v) = %v, want %v", tt.in, tt.def, got, tt.out)
-		}
+	if _, err := s.Select("版", opts, "v7"); err == nil {
+		t.Error("選択肢に無い答えを通しました")
+	}
+	if got, _ := s.Select("版", opts, "v7"); got != "v7" {
+		t.Errorf("答えが尽きたら既定値のはず: %q", got)
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -73,6 +74,10 @@ type logPage struct {
 // 時計とはずれます。数秒の差でも取りこぼしたり余計なものを拾ったりするので、
 // 単調に増える ID を目印にします。
 func (a *App) newestErrorLogID(ctx context.Context, client *api.Client, siteID string) (int64, error) {
+	// ログの一覧は v2 から。読めなければ呼び出し側が「確かめられない」と断って続けます。
+	if err := a.requireAPI(http.MethodGet, "/sites/%s/logs"); err != nil {
+		return 0, err
+	}
 	page, err := a.fetchErrorLogs(ctx, client, siteID, 1)
 	if err != nil {
 		return 0, err

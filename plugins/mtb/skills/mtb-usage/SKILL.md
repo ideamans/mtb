@@ -2,7 +2,7 @@
 name: mtb-usage
 description: Build and edit a Movable Type site with the mtb CLI (Movable Type Builder) — list, create and update entries and pages, upload assets in bulk, manage categories, custom fields, content types and templates, keep templates in Git, trigger rebuilds, and switch between several MT servers with named profiles. Use when someone asks about a Movable Type site, an MT entry or article, publishing or rebuilding an MT blog, or calling the Movable Type Data API.
 license: MIT
-compatibility: Requires the `mtb` binary on PATH — run the mtb-install skill if it is missing. Needs a configured profile and a login (`mtb auth login`), which asks for the MT user's *Web Services Password*. Writes to a live CMS — entries created or deleted here are real.
+compatibility: Requires the `mtb` binary on PATH — run the mtb-install skill if it is missing. Needs a configured profile and a login (`mtb auth login`), which asks for the MT user's *Web Services Password* (the sign-in password on Data API v1/v2). Writes to a live CMS — entries created or deleted here are real.
 allowed-tools: Bash(mtb:*) Bash(jq:*) Bash(command:*) Read Write
 ---
 
@@ -11,6 +11,15 @@ allowed-tools: Bash(mtb:*) Bash(jq:*) Bash(command:*) Read Write
 Drive Movable Type through the `mtb` CLI. Commands mirror the Data API v7
 paths (`mtb sites entries list` is `GET /v7/sites/{site_id}/entries`) and print
 JSON.
+
+Older MT speaks an older Data API version (MT 6.2 is v3). The version belongs to the
+profile. `mtb profile add` without `--api-version` asks the server (v7 down to v1) and
+stores the newest version that answers; if it prints "could not check the version",
+the URL is probably wrong. Change it later with `mtb profile set --api-version v3`
+(there is no per-command override, and `MTB_API_VERSION` is ignored while a profile
+is in use). mtb refuses, before sending, any command that version lacks (exit code 5, "needs Data API v4 or later"). Commands marked
+`[v4+]` in the catalog (content types, category sets) do not exist on MT 6. Do not
+work around the refusal with `mtb api`; the server does not have the endpoint.
 
 ## 1. Confirm the tool, the target and the login
 
@@ -91,7 +100,9 @@ visible to other processes on the same host. **Never use `--password`** — it p
 the secret in the process list and in whatever log holds this transcript.
 
 The password wanted here is the MT **Web Services Password**, not the sign-in
-password. That mismatch is the single most common cause of a 401.
+password. That mismatch is the single most common cause of a 401. The exception
+is Data API v1 and v2, which take the sign-in password; the Web Services Password
+starts at v3 (MT 6.2).
 
 ## 4. Read before you write
 
@@ -258,7 +269,8 @@ are different claims.
 
 | What you see | What to do |
 | --- | --- |
-| 401 on login | Ask the user to check the *web services* password |
+| 401 on login | Ask the user to check the *web services* password (on v1/v2, the sign-in password) |
+| Exit 5, "needs Data API vN or later" | Nothing was sent. The target's version lacks that operation; find another way, or confirm the profile's version (`mtb profile show`) matches the server |
 | 401 mid-session | `mtb auth login` again; the session expired |
 | 403 with a message | Permission, not a bug. Report which operation and let the user fix the role (`Only a system administrator`: no role is enough) |
 | 403 `Forbidden` with no message | The site's Data API is off (every new site starts that way); not a role problem |

@@ -83,6 +83,10 @@ func (a *App) runDump(ctx context.Context, dir, sites string, assetHash bool) er
 	if dir == "" {
 		return usagef("%s", i18n.T("--dir が要ります", "--dir is required"))
 	}
+	// サイトの一覧（GET /sites）は v2 から。v1 では何も取れないので先に止めます。
+	if err := a.requireAPI(http.MethodGet, "/sites"); err != nil {
+		return err
+	}
 	client, err := a.client()
 	if err != nil {
 		return err
@@ -173,6 +177,11 @@ func (a *App) dumpSites(ctx context.Context, client *api.Client, only string) ([
 }
 
 func (a *App) dumpKindTo(ctx context.Context, client *api.Client, kind dumpKind, site dumpSite, dir string, assetHash bool) error {
+	// 接続先の版に無い種類（v3 のコンテンツタイプなど）は、送らずに飛ばします。
+	// 404 でも飛ばしますが、それはプラグイン由来のものに任せます。
+	if !a.apiAvailable(http.MethodGet, kind.Path) {
+		return nil
+	}
 	p := kind.Path
 	if strings.Contains(p, "%s") {
 		p = fmt.Sprintf(p, site.ID)

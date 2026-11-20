@@ -12,6 +12,7 @@
 package config
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -115,18 +116,25 @@ type Resolved struct {
 	Username   string
 	SiteID     string
 	Insecure   bool
+	// IgnoredAPIVersion は、プロファイルを使っているために効かせなかった
+	// MTB_API_VERSION の値です。黙って無視すると、効いていると思い込んだまま
+	// になるので、呼び出し側が警告に使います。
+	IgnoredAPIVersion string
 	// FromFile は設定ファイル由来のプロファイルが見つかったかどうかです。
 	// 認証情報をどのキーで保存するかの判断に使います。
 	FromFile bool
 }
 
 // Overrides はコマンドラインからの上書きです。空文字は「指定なし」を意味します。
+//
+// Data API の版は上書きできません。版はサーバ（＝プロファイル）で決まるもので、
+// コマンドごとに変えると「v3 の MT に v7 で送る」取り違えが起きるためです。
+// 変えるなら mtb profile set --api-version です。
 type Overrides struct {
-	Profile    string
-	BaseURL    string
-	APIVersion string
-	ClientID   string
-	SiteID     string
+	Profile  string
+	BaseURL  string
+	ClientID string
+	SiteID   string
 }
 
 // ErrNoProfile はどこからも接続先を決められなかったときのエラーです。
@@ -148,6 +156,53 @@ func NormalizeBaseURL(base, version string) (string, string) {
 		version = DefaultAPIVersion
 	}
 	return base, version
+}
+
+// VersionNumber は "v3" を 3 にします。形が違えば 0 です。
+func VersionNumber(version string) int {
+	if !strings.HasPrefix(version, "v") || !isDigits(version[1:]) {
+		return 0
+	}
+	n := 0
+	for _, r := range version[1:] {
+		n = n*10 + int(r-'0')
+		if n > 1000 {
+			return 0
+		}
+	}
+	return n
+}
+
+// MTReleases は、Data API の各版を最新として持つ MT の版です。
+//
+// 配布物の lib/MT/App/DataAPI.pm の API_VERSION（6.0.8・6.1.3・6.2.2・6.8.8・7.0・
+// 7 r.4701・7 r.5510・8.0.2・8.4.0・8.8.0・9.0.9・9.3.1）と、v5・v6 を新設した
+// リリースノート（7 r.5401・7 r.5404）で確かめた（2026-11-20）。版を選ばせるときに
+// 「v3」だけでは分からないので、MT の版を添えるのに使います。
+var MTReleases = map[int]string{
+	1: "MT 6.0",
+	2: "MT 6.1",
+	3: "MT 6.2–6.8",
+	4: "MT 7.0–7 r.5304",
+	5: "MT 7 r.5401–r.5403",
+	6: "MT 7 r.5404+ / MT 8.0–8.4",
+	7: "MT 8.8+ / MT 9",
+}
+
+// DescribeVersion は "v3（MT 6.2–6.8）" の形にします。対応表に無い版はそのまま返します。
+func DescribeVersion(version string) string {
+	if mt, ok := MTReleases[VersionNumber(version)]; ok {
+		return fmt.Sprintf(i18n.T("%s（%s）", "%s (%s)"), version, mt)
+	}
+	return version
+}
+
+// UsesSignInPassword は、その版の /authentication がサインインのパスワードを
+// 受け取るかです。v1・v2 はサインインのパスワード、v3 から（MT 6.2〜）は
+// Webサービスパスワードを受け取ります。
+func UsesSignInPassword(version string) bool {
+	n := VersionNumber(version)
+	return n == 1 || n == 2
 }
 
 func isDigits(s string) bool {

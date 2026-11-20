@@ -206,6 +206,9 @@ func (a *App) syncSiteID(args []string) (string, error) {
 }
 
 func (a *App) pullTemplates(ctx context.Context, siteID, dir string) error {
+	if err := a.requireAPI(http.MethodGet, "/sites/%s/templates"); err != nil {
+		return err
+	}
 	client, err := a.client()
 	if err != nil {
 		return err
@@ -254,6 +257,9 @@ func (a *App) pullTemplates(ctx context.Context, siteID, dir string) error {
 }
 
 func (a *App) pushTemplates(ctx context.Context, siteID, dir string) error {
+	if err := a.requireAPI(http.MethodGet, "/sites/%s/templates"); err != nil {
+		return err
+	}
 	m, err := a.readManifest(dir)
 	if err != nil {
 		return err

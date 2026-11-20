@@ -37,7 +37,17 @@ const apiVersion = "v7"
 var (
 	inPath  = flag.String("in", "", "公式の OpenAPI 定義（省くと固定したコミットから取ってくる）")
 	outPath = flag.String("out", "spec.json", "書き出す先")
+	// olderDir は v1〜v6 の定義を置いたディレクトリです（v1.json … v6.json）。
+	// -in を省いたときは、これも固定したコミットから取ってきます。-in だけを
+	// 渡したとき（テスト）は版の注記（since）を付けません。
+	olderDir = flag.String("older", "", "v1〜v6 の公式定義を置いたディレクトリ（v1.json … v6.json）")
 )
+
+// oldestVersion から apiVersion の1つ前までの定義を読み、各操作が
+// 「どの版から使えるか」を割り出します。v7 の定義はそれまでの版の操作を
+// すべて含んでいる（消えた操作は無い。2026-11-20 に確認）ので、v7 を素に
+// コマンドを作り、各操作に since を付けるだけで v1〜v6 にも対応できます。
+const oldestVersion = 1
 
 // sourceCommit は取り込む公式定義のコミットです。上げるときはここだけを
 // 書き換えて make spec を流し、差分（コマンド名の動き）を確かめてから
@@ -46,6 +56,12 @@ const sourceCommit = "8863d203b632f5947cfebbe55642bb9615b49d36"
 
 const sourceURL = "https://raw.githubusercontent.com/movabletype/mt-docs-data-api-reference/" +
 	sourceCommit + "/src/openapi/v7.json"
+
+// sourceURLOf は版ごとの定義の URL です。
+func sourceURLOf(version int) string {
+	return "https://raw.githubusercontent.com/movabletype/mt-docs-data-api-reference/" +
+		sourceCommit + "/src/openapi/v" + strconv.Itoa(version) + ".json"
+}
 
 // referenceURL は公式リファレンスです。各操作へのアンカーは
 // #tag/<最初のタグ>/paths/<パスの / を ~1 にしたもの>/<メソッド> の形をしている。
@@ -165,13 +181,13 @@ var paramNotes = map[string]map[string]note{
 	"PUT /sites/{site_id}/fields/{field_id}":              {"field": customFieldNote},
 	"POST /sites/{site_id}/contentTypes":                  {"content_type": contentTypeNote},
 	"PUT /sites/{site_id}/contentTypes/{content_type_id}": {"content_type": contentTypeNote},
-	"POST /sites":                                {"website": smartReplaceNote},
-	"POST /sites/{site_id}/blogs":                {"blog": smartReplaceNote},
-	"PUT /sites/{site_id}":                       {"website": smartReplaceNote, "blog": smartReplaceNote},
-	"POST /users":                                {"user": userPasswordNote},
-	"GET /publish/entries":                       {"ids": rebuildNote, "startTime": rebuildStartTimeNote},
-	"POST /sites/{site_id}/categories/permutate": {"categories": permutateNote},
-	"POST /sites/{site_id}/folders/permutate":    {"folders": permutateNote},
+	"POST /sites":                                         {"website": smartReplaceNote},
+	"POST /sites/{site_id}/blogs":                         {"blog": smartReplaceNote},
+	"PUT /sites/{site_id}":                                {"website": smartReplaceNote, "blog": smartReplaceNote},
+	"POST /users":                                         {"user": userPasswordNote},
+	"GET /publish/entries":                                {"ids": rebuildNote, "startTime": rebuildStartTimeNote},
+	"POST /sites/{site_id}/categories/permutate":          {"categories": permutateNote},
+	"POST /sites/{site_id}/folders/permutate":             {"folders": permutateNote},
 	"POST /sites/{site_id}/categorySets/{category_set_id}/categories/permutate":  {"categories": permutateNote},
 	"POST /sites/{site_id}/contentTypes/{content_type_id}/fields/permutate":      {"content_fields": permutateNote},
 	"POST /sites/{site_id}/contentTypes/{content_type_id}/data":                  {"content_data": contentDataNote},
@@ -455,6 +471,11 @@ func run() error {
 		return err
 	}
 
+	since, err := sinceTable()
+	if err != nil {
+		return err
+	}
+
 	byCommand := map[string]*spec.Command{}
 	var order []string
 
@@ -474,6 +495,9 @@ func run() error {
 			op, cmdPath, err := convert(&in, path, method, &ro)
 			if err != nil {
 				return err
+			}
+			if v := since[op.Method+" "+op.Path]; v > oldestVersion {
+				op.Since = v
 			}
 			key := strings.Join(cmdPath, " ")
 			c, ok := byCommand[key]
@@ -501,6 +525,7 @@ func run() error {
 		out.Commands = append(out.Commands, c)
 	}
 	out.Groups = groupsOf(out.Commands)
+	markLatestOnly(out.Commands, since)
 
 	enc, err := json.MarshalIndent(out, "", "  ")
 	if err != nil {
@@ -874,22 +899,28 @@ func readSource(path string) ([]byte, error) {
 	if path != "" {
 		return os.ReadFile(path)
 	}
+	return fetchVersion(7)
+}
+
+// fetchVersion は固定したコミットから版ごとの定義を取り、キャッシュに置きます。
+func fetchVersion(version int) ([]byte, error) {
 	dir, err := os.UserCacheDir()
 	if err != nil {
 		return nil, err
 	}
-	cache := filepath.Join(dir, "mtb-gen-spec", "openapi-v7-"+sourceCommit[:12]+".json")
+	cache := filepath.Join(dir, "mtb-gen-spec", fmt.Sprintf("openapi-v%d-%s.json", version, sourceCommit[:12]))
 	if buf, err := os.ReadFile(cache); err == nil {
 		return buf, nil
 	}
+	u := sourceURLOf(version)
 	client := &http.Client{Timeout: 60 * time.Second}
-	resp, err := client.Get(sourceURL)
+	resp, err := client.Get(u)
 	if err != nil {
 		return nil, fmt.Errorf("公式定義を取得できません: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("公式定義を取得できません: %s %s", resp.Status, sourceURL)
+		return nil, fmt.Errorf("公式定義を取得できません: %s %s", resp.Status, u)
 	}
 	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -899,6 +930,60 @@ func readSource(path string) ([]byte, error) {
 		_ = os.WriteFile(cache, buf, 0o644)
 	}
 	return buf, nil
+}
+
+// sinceTable は「メソッド パス」→ その操作が現れる最初の版、の表です。
+// v7 にしか無い操作は表に載りません（呼び出し側で 7 として扱わず、
+// 載っていない＝v7 から、と読む）。
+func sinceTable() (map[string]int, error) {
+	out := map[string]int{}
+	if *inPath != "" && *olderDir == "" {
+		return out, nil
+	}
+	for v := oldestVersion; v < 7; v++ {
+		var buf []byte
+		var err error
+		if *olderDir != "" {
+			buf, err = os.ReadFile(filepath.Join(*olderDir, fmt.Sprintf("v%d.json", v)))
+		} else {
+			buf, err = fetchVersion(v)
+		}
+		if err != nil {
+			return nil, err
+		}
+		var in struct {
+			Paths map[string]map[string]json.RawMessage `json:"paths"`
+		}
+		if err := json.Unmarshal(buf, &in); err != nil {
+			return nil, fmt.Errorf("v%d: %w", v, err)
+		}
+		for path, item := range in.Paths {
+			for _, method := range httpMethods {
+				if _, ok := item[method]; !ok {
+					continue
+				}
+				key := strings.ToUpper(method) + " " + path
+				if _, seen := out[key]; !seen {
+					out[key] = v
+				}
+			}
+		}
+	}
+	return out, nil
+}
+
+// markLatestOnly は v1〜v6 のどれにも無い操作に since=7 を付けます。
+func markLatestOnly(commands []*spec.Command, since map[string]int) {
+	if len(since) == 0 {
+		return
+	}
+	for _, c := range commands {
+		for _, op := range c.Ops {
+			if _, ok := since[op.Method+" "+op.Path]; !ok {
+				op.Since = 7
+			}
+		}
+	}
 }
 
 func firstLine(s string) string {

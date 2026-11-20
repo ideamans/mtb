@@ -8,7 +8,6 @@ cobra のコマンド定義から `go generate ./...` で生成しています�
 
 | flag | type | default | description |
 | --- | --- | --- | --- |
-| `--api-version` | string | — | エンドポイントのバージョン（既定 v7） |
 | `--audit-note` | string | — | 何の作業かの説明を X-MTB-Audit-Note ヘッダで送る（サーバが監査ログを取っていれば一緒に残る。既定は MTB_AUDIT_NOTE） |
 | `--base-url` | string | — | mt-data-api.cgi までの URL（プロファイルより優先） |
 | `--client-id` | string | — | 認証時に名乗る clientId（既定 mtb） |
@@ -109,10 +108,10 @@ Plugins
 
 接続先プロファイルの管理
 
-- `mtb profile add <名前>` `[--site-id --use --username]` — プロファイルを追加する
+- `mtb profile add <名前>` `[--api-version --site-id --use --username]` — プロファイルを追加する
 - `mtb profile list` — プロファイルの一覧
 - `mtb profile remove <名前>` — プロファイルと、その認証情報を消す
-- `mtb profile set` `[--site-id --username]` — いまのプロファイルの設定を変える
+- `mtb profile set` `[--api-version --site-id --username]` — いまのプロファイルの設定を変える
 - `mtb profile show` — いま使う接続先の解決結果を表示する
 - `mtb profile use <名前>` — 既定のプロファイルを切り替える
 
@@ -120,7 +119,7 @@ Plugins
 
 Publish
 
-- `mtb publish content-data` `[--blog-id --blog-ids --fields --form --ids --query --start-time --wait]` — Publish Content Data
+- `mtb publish content-data` `[--blog-id --blog-ids --fields --form --ids --query --start-time --wait]` — Publish Content Data [v4+]
 - `mtb publish entries` `[--blog-id --fields --form --ids --query --start-time --wait]` — Rebuild the static archives in relation to specified entries
 - `mtb recover-password` `[--email --fields --form --name --query]` — Send the link for password recovery to specified email
 
@@ -208,42 +207,42 @@ Categories
 
 ### `mtb sites category-sets`
 
-Category Sets
+Category Sets [v4+]
 
 
 #### `mtb sites category-sets categories`
 
-Categories
+Categories [v4+]
 
 
 ##### `mtb sites category-sets categories children`
 
-Categories
+Categories [v4+]
 
-- `mtb sites category-sets categories children list [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --include-current --max-depth --query --site-id]` — Category Collection of child categories for category set
-- `mtb sites category-sets categories create [site-id] [category-set-id]` `[--category --category-set-id --fields --form --query --set --set-json --site-id]` — Create a new category for category set
-- `mtb sites category-sets categories delete [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --query --site-id]` — Delete single category in category set
-- `mtb sites category-sets categories get [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --query --site-id]` — Fetch single category in category set
-- `mtb sites category-sets categories list [site-id] [category-set-id]` `[--all --category-set-id --date-field --date-from --date-to --fields --form --include-current --limit --max-depth --offset --query --search-fields --site-id --sort-by --sort-order]` — Category Collection for category set
+- `mtb sites category-sets categories children list [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --include-current --max-depth --query --site-id]` — Category Collection of child categories for category set [v4+]
+- `mtb sites category-sets categories create [site-id] [category-set-id]` `[--category --category-set-id --fields --form --query --set --set-json --site-id]` — Create a new category for category set [v4+]
+- `mtb sites category-sets categories delete [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --query --site-id]` — Delete single category in category set [v4+]
+- `mtb sites category-sets categories get [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --query --site-id]` — Fetch single category in category set [v4+]
+- `mtb sites category-sets categories list [site-id] [category-set-id]` `[--all --category-set-id --date-field --date-from --date-to --fields --form --include-current --limit --max-depth --offset --query --search-fields --site-id --sort-by --sort-order]` — Category Collection for category set [v4+]
 
 ##### `mtb sites category-sets categories parents`
 
-Categories
+Categories [v4+]
 
-- `mtb sites category-sets categories parents list [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --include-current --max-depth --query --site-id]` — Category Collection of parent categories for category set
-- `mtb sites category-sets categories permutate [site-id] [category-set-id]` `[--categories --category-set-id --fields --form --query --set --set-json --site-id]` — Save hierarchical categories order in category set
+- `mtb sites category-sets categories parents list [site-id] [category-set-id] [category-id]` `[--category-id --category-set-id --fields --form --include-current --max-depth --query --site-id]` — Category Collection of parent categories for category set [v4+]
+- `mtb sites category-sets categories permutate [site-id] [category-set-id]` `[--categories --category-set-id --fields --form --query --set --set-json --site-id]` — Save hierarchical categories order in category set [v4+]
 
 ##### `mtb sites category-sets categories siblings`
 
-Categories
+Categories [v4+]
 
-- `mtb sites category-sets categories siblings list [site-id] [category-set-id] [category-id]` `[--all --category-id --category-set-id --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search --search-fields --site-id --sort-by --sort-order --top]` — Category Collection of sibling categories for category set
-- `mtb sites category-sets categories update [site-id] [category-set-id] [category-id]` `[--category --category-id --category-set-id --fields --form --query --set --set-json --site-id]` — Update single category in category set
-- `mtb sites category-sets create [site-id]` `[--category-set --fields --form --query --set --set-json --site-id]` — Create a new category set
-- `mtb sites category-sets delete [site-id] [category-set-id]` `[--category-set-id --fields --form --query --site-id]` — Delete category set
-- `mtb sites category-sets get [site-id] [category-set-id]` `[--category-set-id --fields --form --query --site-id]` — Fetch single category set
-- `mtb sites category-sets list [site-id]` `[--all --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search --search-fields --site-id --sort-by --sort-order]` — Category Set Collection
-- `mtb sites category-sets update [site-id] [category-set-id]` `[--category-set --category-set-id --fields --form --query --set --set-json --site-id]` — Update category set
+- `mtb sites category-sets categories siblings list [site-id] [category-set-id] [category-id]` `[--all --category-id --category-set-id --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search --search-fields --site-id --sort-by --sort-order --top]` — Category Collection of sibling categories for category set [v4+]
+- `mtb sites category-sets categories update [site-id] [category-set-id] [category-id]` `[--category --category-id --category-set-id --fields --form --query --set --set-json --site-id]` — Update single category in category set [v4+]
+- `mtb sites category-sets create [site-id]` `[--category-set --fields --form --query --set --set-json --site-id]` — Create a new category set [v4+]
+- `mtb sites category-sets delete [site-id] [category-set-id]` `[--category-set-id --fields --form --query --site-id]` — Delete category set [v4+]
+- `mtb sites category-sets get [site-id] [category-set-id]` `[--category-set-id --fields --form --query --site-id]` — Fetch single category set [v4+]
+- `mtb sites category-sets list [site-id]` `[--all --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search --search-fields --site-id --sort-by --sort-order]` — Category Set Collection [v4+]
+- `mtb sites category-sets update [site-id] [category-set-id]` `[--category-set --category-set-id --fields --form --query --set --set-json --site-id]` — Update category set [v4+]
 
 ### `mtb sites children`
 
@@ -262,35 +261,35 @@ Comments
 
 ### `mtb sites content-types`
 
-Content Types
+Content Types [v4+]
 
-- `mtb sites content-types create [site-id]` `[--content-type --fields --form --query --set --set-json --site-id]` — Create Content Type
+- `mtb sites content-types create [site-id]` `[--content-type --fields --form --query --set --set-json --site-id]` — Create Content Type [v4+]
 
 #### `mtb sites content-types data`
 
-Content Types
+Content Types [v4+]
 
-- `mtb sites content-types data create [site-id] [content-type-id]` `[--content-data --content-type-id --fields --form --query --save-revision --set --set-json --site-id]` — Create Content Data
-- `mtb sites content-types data delete [site-id] [content-type-id] [content-data-id]` `[--content-data-id --content-type-id --fields --form --query --site-id]` — Delete single content data
-- `mtb sites content-types data get [site-id] [content-type-id] [content-data-id]` `[--content-data-id --content-type-id --fields --form --no-text-filter --query --site-id]` — Fetch single Content Data
-- `mtb sites content-types data list [site-id] [content-type-id]` `[--all --content-type-id --date-field --date-from --date-to --exclude-ids --fields --filter-keys --form --include-ids --limit --no-text-filter --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Data Collection
-- `mtb sites content-types data preview [site-id] [content-type-id] [content-data-id]` `[--content-data --content-data-id --content-type-id --fields --form --query --raw --set --set-json --site-id]` — Make a preview by data
-- `mtb sites content-types data update [site-id] [content-type-id] [content-data-id]` `[--content-data --content-data-id --content-type-id --fields --form --query --save-revision --set --set-json --site-id]` — Update Content Data
-- `mtb sites content-types delete [site-id] [content-type-id]` `[--content-type-id --fields --form --query --site-id]` — Delete Content Type
+- `mtb sites content-types data create [site-id] [content-type-id]` `[--content-data --content-type-id --fields --form --query --save-revision --set --set-json --site-id]` — Create Content Data [v4+]
+- `mtb sites content-types data delete [site-id] [content-type-id] [content-data-id]` `[--content-data-id --content-type-id --fields --form --query --site-id]` — Delete single content data [v4+]
+- `mtb sites content-types data get [site-id] [content-type-id] [content-data-id]` `[--content-data-id --content-type-id --fields --form --no-text-filter --query --site-id]` — Fetch single Content Data [v4+]
+- `mtb sites content-types data list [site-id] [content-type-id]` `[--all --content-type-id --date-field --date-from --date-to --exclude-ids --fields --filter-keys --form --include-ids --limit --no-text-filter --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Data Collection [v4+]
+- `mtb sites content-types data preview [site-id] [content-type-id] [content-data-id]` `[--content-data --content-data-id --content-type-id --fields --form --query --raw --set --set-json --site-id]` — Make a preview by data [v4+]
+- `mtb sites content-types data update [site-id] [content-type-id] [content-data-id]` `[--content-data --content-data-id --content-type-id --fields --form --query --save-revision --set --set-json --site-id]` — Update Content Data [v4+]
+- `mtb sites content-types delete [site-id] [content-type-id]` `[--content-type-id --fields --form --query --site-id]` — Delete Content Type [v4+]
 
 #### `mtb sites content-types fields`
 
-Content Types
+Content Types [v4+]
 
-- `mtb sites content-types fields create [site-id] [content-type-id]` `[--content-field --content-type-id --fields --form --query --set --set-json --site-id]` — Create Content Field
-- `mtb sites content-types fields delete [site-id] [content-type-id] [content-field-id]` `[--content-field-id --content-type-id --fields --form --query --site-id]` — Delete Content Field
-- `mtb sites content-types fields get [site-id] [content-type-id] [content-field-id]` `[--content-field-id --content-type-id --fields --form --query --site-id]` — Fetch single Content Field
-- `mtb sites content-types fields list [site-id] [content-type-id]` `[--all --content-type-id --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Field Collection
-- `mtb sites content-types fields permutate [site-id] [content-type-id]` `[--content-fields --content-type-id --fields --form --query --set --set-json --site-id]` — Save hierarchical content field order
-- `mtb sites content-types fields update [site-id] [content-type-id] [content-field-id]` `[--content-field --content-field-id --content-type-id --fields --form --query --set --set-json --site-id]` — Update Content Field
-- `mtb sites content-types get [site-id] [content-type-id]` `[--content-type-id --fields --form --query --site-id]` — Fetch single Content Type
-- `mtb sites content-types list [site-id]` `[--all --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Type Collection
-- `mtb sites content-types update [site-id] [content-type-id]` `[--content-type --content-type-id --fields --form --query --set --set-json --site-id]` — Update Content Type
+- `mtb sites content-types fields create [site-id] [content-type-id]` `[--content-field --content-type-id --fields --form --query --set --set-json --site-id]` — Create Content Field [v4+]
+- `mtb sites content-types fields delete [site-id] [content-type-id] [content-field-id]` `[--content-field-id --content-type-id --fields --form --query --site-id]` — Delete Content Field [v4+]
+- `mtb sites content-types fields get [site-id] [content-type-id] [content-field-id]` `[--content-field-id --content-type-id --fields --form --query --site-id]` — Fetch single Content Field [v4+]
+- `mtb sites content-types fields list [site-id] [content-type-id]` `[--all --content-type-id --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Field Collection [v4+]
+- `mtb sites content-types fields permutate [site-id] [content-type-id]` `[--content-fields --content-type-id --fields --form --query --set --set-json --site-id]` — Save hierarchical content field order [v4+]
+- `mtb sites content-types fields update [site-id] [content-type-id] [content-field-id]` `[--content-field --content-field-id --content-type-id --fields --form --query --set --set-json --site-id]` — Update Content Field [v4+]
+- `mtb sites content-types get [site-id] [content-type-id]` `[--content-type-id --fields --form --query --site-id]` — Fetch single Content Type [v4+]
+- `mtb sites content-types list [site-id]` `[--all --date-field --date-from --date-to --exclude-ids --fields --form --include-ids --limit --offset --query --search-fields --site-id --sort-by --sort-order]` — Content Type Collection [v4+]
+- `mtb sites content-types update [site-id] [content-type-id]` `[--content-type --content-type-id --fields --form --query --set --set-json --site-id]` — Update Content Type [v4+]
 - `mtb sites create` `[--fields --form --query --set --set-json --website]` — Create a new website
 - `mtb sites create-blog [site-id]` `[--blog --fields --form --query --set --set-json --site-id]` — Create a new blog
 - `mtb sites delete [site-id]` `[--confirm --fields --form --query --site-id]` — Delete an existing blog or website
@@ -460,15 +459,15 @@ Statistics
 
 ##### `mtb sites stats date screen-page-views`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats date screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each date from provider (e.g. Google Analytics V4)
+- `mtb sites stats date screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each date from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats date sessions`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats date sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each date from provider (e.g. Google Analytics V4)
+- `mtb sites stats date sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each date from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats date visits`
 
@@ -489,15 +488,15 @@ Statistics
 
 ##### `mtb sites stats path screen-page-views`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats path screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each path from provider (e.g. Google Analytics V4)
+- `mtb sites stats path screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each path from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats path sessions`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats path sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each path from provider (e.g. Google Analytics V4)
+- `mtb sites stats path sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each path from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats path visits`
 
@@ -508,54 +507,54 @@ Statistics
 
 #### `mtb sites stats year`
 
-Statistics
+Statistics [v7+]
 
 
 ##### `mtb sites stats year screen-page-views`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each year from provider (e.g. Google Analytics V4)
+- `mtb sites stats year screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each year from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats year sessions`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each year from provider (e.g. Google Analytics V4)
+- `mtb sites stats year sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each year from provider (e.g. Google Analytics V4) [v7+]
 
 #### `mtb sites stats year-month`
 
-Statistics
+Statistics [v7+]
 
 
 ##### `mtb sites stats year-month screen-page-views`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year-month screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each yearMonth from provider (e.g. Google Analytics V4)
+- `mtb sites stats year-month screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each yearMonth from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats year-month sessions`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year-month sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each yearMonth from provider (e.g. Google Analytics V4)
+- `mtb sites stats year-month sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each yearMonth from provider (e.g. Google Analytics V4) [v7+]
 
 #### `mtb sites stats year-week`
 
-Statistics
+Statistics [v7+]
 
 
 ##### `mtb sites stats year-week screen-page-views`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year-week screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each yearWeek from provider (e.g. Google Analytics V4)
+- `mtb sites stats year-week screen-page-views list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date --unique-path]` — Retrieve screenPageViews count for each yearWeek from provider (e.g. Google Analytics V4) [v7+]
 
 ##### `mtb sites stats year-week sessions`
 
-Statistics
+Statistics [v7+]
 
-- `mtb sites stats year-week sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each yearWeek from provider (e.g. Google Analytics V4)
+- `mtb sites stats year-week sessions list [site-id]` `[--all --end-date --fields --form --limit --offset --page-path --query --site-id --start-date]` — Retrieve sessions count for each yearWeek from provider (e.g. Google Analytics V4) [v7+]
 
 ### `mtb sites tags`
 
@@ -650,9 +649,9 @@ Widgets
 
 ## `mtb text-filters`
 
-System
+System [v5+]
 
-- `mtb text-filters list` `[--fields --form --query]` — Retrieve a list of text filters
+- `mtb text-filters list` `[--fields --form --query]` — Retrieve a list of text filters [v5+]
 
 ## `mtb themes`
 

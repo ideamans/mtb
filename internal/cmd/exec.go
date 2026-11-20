@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ideamans/mtb/internal/api"
+	"github.com/ideamans/mtb/internal/config"
 	"github.com/ideamans/mtb/internal/i18n"
 	"github.com/ideamans/mtb/internal/spec"
 )
@@ -58,6 +59,12 @@ func (a *App) runOperation(cmd *cobra.Command, sc *spec.Command, args []string) 
 	op := selectOperation(sc, pathValues)
 	if op == nil {
 		return missingPathParams(sc, pathValues)
+	}
+	if err := checkVersion(r); err != nil {
+		return err
+	}
+	if err := checkAvailable(op, r.APIVersion); err != nil {
+		return err
 	}
 
 	req, err := a.buildRequest(cmd, op, pathValues, r.SiteID)
@@ -117,7 +124,10 @@ func (a *App) runOperation(cmd *cobra.Command, sc *spec.Command, args []string) 
 		if !ok {
 			return errAborted()
 		}
-		if replacer, err = a.newAssetReplacer(context.Background(), client, req.Form.Get("site_id")); err != nil {
+		// サイトID は本文（POST /assets/upload の site_id）か、パス
+		// （POST /sites/{site_id}/assets/upload）のどちらかにある。
+		siteID := firstNonEmptyString(req.Form.Get("site_id"), pathValues["site-id"])
+		if replacer, err = a.newAssetReplacer(context.Background(), client, siteID); err != nil {
 			return err
 		}
 	}
@@ -209,6 +219,21 @@ func (a *App) writeOutput(cmd *cobra.Command, sc *spec.Command, resp *api.Respon
 		a.warnEmptyFields(resp, fields)
 	}
 	return a.writeResponse(resp)
+}
+
+// checkAvailable は、接続先の Data API の版でその操作が使えるかを確かめます。
+//
+// 版が足りない操作を送ると、MT は 404 を返します。それでは「対象が無い」と
+// 区別が付かず、ID を疑って堂々巡りになるので、送る前に理由を言って止めます。
+// --dry-run でも止めます（送れない内容を見せても意味がないため）。
+func checkAvailable(op *spec.Operation, apiVersion string) error {
+	if op.AvailableIn(config.VersionNumber(apiVersion)) {
+		return nil
+	}
+	return usagef(i18n.T(
+		"%s %s は Data API v%d 以降の操作です。接続先は %s なので送りません（MT の版とプロファイルの版を mtb profile show で確かめてください）",
+		"%s %s needs Data API v%d or later; the target speaks %s, so it was not sent (compare the MT version with the profile's, shown by mtb profile show)"),
+		op.Method, op.Path, op.Since, apiVersion)
 }
 
 // selectOperation は与えられたパスパラメータで成立する最初のオペレーションを

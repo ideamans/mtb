@@ -160,7 +160,18 @@ func (s *Store) Resolve(o Overrides) (*Resolved, error) {
 	}
 
 	r.BaseURL = firstNonEmpty(o.BaseURL, s.env("MTB_BASE_URL"), r.BaseURL)
-	r.APIVersion = firstNonEmpty(o.APIVersion, s.env("MTB_API_VERSION"), r.APIVersion, DefaultAPIVersion)
+	// 版はプロファイルに紐づく。MTB_API_VERSION が効くのは、プロファイルを
+	// 使わずに MTB_BASE_URL だけでつなぐときだけです。
+	if env := s.env("MTB_API_VERSION"); env != "" {
+		if r.FromFile {
+			if env != firstNonEmpty(r.APIVersion, DefaultAPIVersion) {
+				r.IgnoredAPIVersion = env
+			}
+		} else {
+			r.APIVersion = env
+		}
+	}
+	r.APIVersion = firstNonEmpty(r.APIVersion, DefaultAPIVersion)
 	r.ClientID = firstNonEmpty(o.ClientID, s.env("MTB_CLIENT_ID"), r.ClientID, DefaultClientID)
 	r.Username = firstNonEmpty(s.env("MTB_USERNAME"), r.Username)
 	r.SiteID = firstNonEmpty(o.SiteID, s.env("MTB_SITE_ID"), r.SiteID)
@@ -174,7 +185,14 @@ func (s *Store) Resolve(o Overrides) (*Resolved, error) {
 			"%w. Register one with: mtb profile add <name> --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi, or set MTB_BASE_URL"),
 			ErrNoProfile)
 	}
-	r.BaseURL, r.APIVersion = NormalizeBaseURL(r.BaseURL, r.APIVersion)
+	// URL 末尾の /vN は取り除く。版として採るのはプロファイルが無いときだけ
+	// （プロファイルの URL は登録時に /vN を落としてあるので、付いているのは
+	// --base-url や MTB_BASE_URL で上書きしたときです）。
+	base, version := NormalizeBaseURL(r.BaseURL, r.APIVersion)
+	r.BaseURL = base
+	if !r.FromFile {
+		r.APIVersion = version
+	}
 	return r, nil
 }
 

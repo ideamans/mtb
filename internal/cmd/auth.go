@@ -42,7 +42,8 @@ func (a *App) newAuthLoginCmd() *cobra.Command {
 			"ユーザー名とパスワードで認証し、セッションIDとアクセストークンを保存します。\n\n"+
 				"パスワードは MT の「Webサービスパスワード」です。サインイン用の\n"+
 				"パスワードとは別物で、MT のユーザー情報の編集画面で発行します（MT 9 では\n"+
-				"発行したときにしか表示されません。分からなくなったら削除して発行し直します）。\n\n"+
+				"発行したときにしか表示されません。分からなくなったら削除して発行し直します）。\n"+
+				"ただし Data API v1・v2 はサインイン用のパスワードを受け取ります。\n\n"+
 				"パスワードは保存しません。保存するのはセッションIDとアクセストークンで、\n"+
 				"アクセストークンが切れたらセッションIDから自動で取り直します。\n\n"+
 				"対話できない環境では --username と --password-stdin を使ってください。\n\n"+
@@ -54,7 +55,8 @@ func (a *App) newAuthLoginCmd() *cobra.Command {
 				"The password is the MT Web Services Password. It is separate from the\n"+
 				"password you sign in to MT with, and is issued on your user profile screen\n"+
 				"in MT (MT 9 shows it only once, when issued; if it is lost, delete it and\n"+
-				"issue a new one).\n\n"+
+				"issue a new one). Data API v1 and v2, however, take the\n"+
+				"sign-in password.\n\n"+
 				"The password itself is never stored. What is stored is the session ID and\n"+
 				"the access token; when the access token expires it is renewed automatically\n"+
 				"from the session ID.\n\n"+
@@ -74,8 +76,8 @@ func (a *App) newAuthLoginCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&username, "username", "", i18n.T("サインイン名", "sign-in name"))
-	cmd.Flags().StringVar(&password, "password", "", i18n.T("Webサービスパスワード（プロセス一覧に残ります。--password-stdin を推奨）", "Web Services Password (this stays in the process list; prefer --password-stdin)"))
-	cmd.Flags().BoolVar(&passwordStdin, "password-stdin", false, i18n.T("Webサービスパスワードを標準入力から読む", "read the Web Services Password from standard input"))
+	cmd.Flags().StringVar(&password, "password", "", i18n.T("Webサービスパスワード（v1・v2 ではサインインのパスワード。プロセス一覧に残ります。--password-stdin を推奨）", "Web Services Password (the sign-in password on v1 and v2; this stays in the process list; prefer --password-stdin)"))
+	cmd.Flags().BoolVar(&passwordStdin, "password-stdin", false, i18n.T("Webサービスパスワード（v1・v2 ではサインインのパスワード）を標準入力から読む", "read the Web Services Password (the sign-in password on v1 and v2) from standard input"))
 	cmd.Flags().BoolVar(&noRemember, "no-remember", false, i18n.T("永続セッションを作らない（再サインインが頻繁になります）", "do not create a persistent session (you will sign in more often)"))
 	return cmd
 }
@@ -127,7 +129,11 @@ func (a *App) signIn(opts signInOptions) error {
 		password = a.env.Store.Env("MTB_PASSWORD")
 	}
 	if password == "" && a.env.Prompt != nil && a.env.Prompt.Interactive() {
-		password, err = a.env.Prompt.Secret(i18n.T("Webサービスパスワード", "Web Services Password"))
+		label := i18n.T("Webサービスパスワード", "Web Services Password")
+		if config.UsesSignInPassword(r.APIVersion) {
+			label = i18n.T("パスワード（サインイン用）", "Password (the one you sign in with)")
+		}
+		password, err = a.env.Prompt.Secret(label)
 		if err != nil {
 			return err
 		}

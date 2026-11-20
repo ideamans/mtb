@@ -64,14 +64,36 @@ type Operation struct {
 	// 書いた説明だけがここに入ります。
 	Description string `json:"description,omitempty"`
 	// DocURL は公式リファレンスのその操作の箇所です。--help に出します。
-	DocURL     string   `json:"docUrl,omitempty"`
-	Deprecated bool     `json:"deprecated,omitempty"`
+	DocURL     string `json:"docUrl,omitempty"`
+	Deprecated bool   `json:"deprecated,omitempty"`
+	// Since はこの操作が使える最初の Data API の版です（4 なら v4 以降）。
+	// 0 は v1 から使えることを表します。公式の版ごとの定義（v1〜v7）を
+	// 突き合わせて gen-spec が付けます。拡張の操作では常に 0 です。
+	Since      int      `json:"since,omitempty"`
 	PathParams []*Param `json:"pathParams,omitempty"`
 	Query      []*Param `json:"query,omitempty"`
 	Body       []*Param `json:"body,omitempty"`
 	// BodyKind は "form"（application/x-www-form-urlencoded）か
 	// "multipart"（multipart/form-data）か、本文を取らないなら空です。
 	BodyKind string `json:"bodyKind,omitempty"`
+}
+
+// AvailableIn は、版 version（v3 なら 3）の接続先でこの操作が使えるかです。
+// version が 0（不明）のときは使えるとみなします。
+func (o *Operation) AvailableIn(version int) bool {
+	return version == 0 || o.Since <= version
+}
+
+// Find はメソッドとパス（{site_id} の形）から操作を引きます。
+func (s *Spec) Find(method, path string) *Operation {
+	for _, c := range s.Commands {
+		for _, op := range c.Ops {
+			if op.Method == method && op.Path == path {
+				return op
+			}
+		}
+	}
+	return nil
 }
 
 // Param はパス・クエリ・本文のパラメータ1つです。

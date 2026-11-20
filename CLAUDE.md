@@ -1,7 +1,8 @@
 # CLAUDE.md — mtb
 
 Movable Type のサイトを組み立てる CLI（Movable Type Builder CLI）。
-土台は Data API (v7)。**バイナリ名・リポジトリ名（`ideamans/mtb`）・リリースアーカイブ名・
+土台は Data API (v7) で、v1〜v6 の古い MT（MT 6 系）にもつなぐ（2026-11-20〜）。**版はプロファイルに紐づけ、コマンドごとの上書き（共通フラグ・プロファイル使用中の `MTB_API_VERSION`）は持たない。**
+**バイナリ名・リポジトリ名（`ideamans/mtb`）・リリースアーカイブ名・
 Claude プラグイン名はどれも `mtb`**（2026-11-08 に `movable-type-builder-cli` から改名。
 v0.1.0 のアーカイブだけ旧名）。main パッケージは `cmd/mtb` にあるので
 `go install github.com/ideamans/mtb/cmd/mtb@latest` は `mtb` を作る。
@@ -33,6 +34,14 @@ cobra のツリーを組み立てる。生成されるのは 220 コマンド / 
 を回している（`--all` や `--dir` と同じ立場）。利用者はテンプレートの操作を
 `sites templates` で探すので、別の場所に置くより見つけやすい。MT 側が同名の
 エンドポイントを足せば `TestNoDuplicateNamesAmongSiblings` が落ちる。
+
+**版の対応は「使える最初の版」を持たせるだけ。** gen-spec が同じコミットの
+v1〜v6 の定義も読み、各操作に `since` を付ける（v7 は旧版の操作をすべて含み、
+パスも同じなので、コマンドは v7 から1組だけ作る）。実行時に接続先の版が
+足りなければ `checkAvailable` が送る前に止める（終了コード 5）。**手書きの機能が
+パスを直に組むときは `requireAPI` / `apiAvailable` を通すこと**——通さないと
+古い MT で 404 になり、「対象が無い」と区別が付かない。v1・v2 は
+`/authentication` がサインインのパスワードを取る（`config.UsesSignInPassword`）。
 
 つまり **エンドポイントに対応するコマンドを足す作業は無い**。MT 側が増えたら
 定義を取り込み直す。名前が気に入らないなら `internal/gen-spec/main.go` の
@@ -151,6 +160,10 @@ Data API を薄く包むことではない。**API の形をそのまま利用�
 | 端末入力 | `prompt.Prompter` | `prompt.Scripted` |
 | 表示言語 | `Env.Getenv` / `--lang` | `withLang("en")` |
 | 入出力・ファイル読み書き | `cmd.Env` | バッファとマップ |
+
+**対話入力の描画は charmbracelet/huh**（`prompt.Terminal`）。素の1行読みだと矢印キーが
+`^[[D` のまま入っていた。huh は確定したフォームを画面から消すので、答えは `✔ 項目: 値` の
+1行で残している（パスワードは伏せ字）。選択肢は `Prompter.Select`。
 
 `internal/cmd/harness_test.go` がこれらを一式差し替えた CLI を組む。
 新しいコマンドのテストはそこに乗せる。
