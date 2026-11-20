@@ -112,7 +112,8 @@ var overrides = map[string][]string{
 	// コレクションへの DELETE は「全ログ削除」。1件削除と同名になると事故る。
 	"DELETE /sites/{site_id}/logs": {"sites", "logs", "reset"},
 	// GET だが再構築の実行。"list" ではない。
-	"GET /publish/entries":     {"publish", "entries"},
+	"GET /publish/entries": {"publish", "entries"},
+
 	"GET /publish/contentData": {"publish", "content-data"},
 	// 現在有効なプロバイダを1つ返す。コレクションではない。
 	"GET /sites/{site_id}/stats/provider": {"sites", "stats", "provider"},
@@ -181,13 +182,15 @@ var paramNotes = map[string]map[string]note{
 	"PUT /sites/{site_id}/fields/{field_id}":              {"field": customFieldNote},
 	"POST /sites/{site_id}/contentTypes":                  {"content_type": contentTypeNote},
 	"PUT /sites/{site_id}/contentTypes/{content_type_id}": {"content_type": contentTypeNote},
-	"POST /sites":                                         {"website": smartReplaceNote},
-	"POST /sites/{site_id}/blogs":                         {"blog": smartReplaceNote},
-	"PUT /sites/{site_id}":                                {"website": smartReplaceNote, "blog": smartReplaceNote},
-	"POST /users":                                         {"user": userPasswordNote},
-	"GET /publish/entries":                                {"ids": rebuildNote, "startTime": rebuildStartTimeNote},
-	"POST /sites/{site_id}/categories/permutate":          {"categories": permutateNote},
-	"POST /sites/{site_id}/folders/permutate":             {"folders": permutateNote},
+
+	"POST /sites":                                {"website": smartReplaceNote},
+	"POST /sites/{site_id}/blogs":                {"blog": smartReplaceNote},
+	"PUT /sites/{site_id}":                       {"website": smartReplaceNote, "blog": smartReplaceNote},
+	"POST /users":                                {"user": userPasswordNote},
+	"GET /publish/entries":                       {"ids": rebuildNote, "startTime": rebuildStartTimeNote},
+	"POST /sites/{site_id}/categories/permutate": {"categories": permutateNote},
+	"POST /sites/{site_id}/folders/permutate":    {"folders": permutateNote},
+
 	"POST /sites/{site_id}/categorySets/{category_set_id}/categories/permutate":  {"categories": permutateNote},
 	"POST /sites/{site_id}/contentTypes/{content_type_id}/fields/permutate":      {"content_fields": permutateNote},
 	"POST /sites/{site_id}/contentTypes/{content_type_id}/data":                  {"content_data": contentDataNote},
