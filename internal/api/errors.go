@@ -82,6 +82,12 @@ func (e *Error) Hint() string {
 			return i18n.T(
 				"サーバの設定でこの操作は止められています。権限の問題ではないので、プロファイルやロールを変えても通りません。開けるかどうかは MT の管理者が決めることなので、利用者に伝えてください。",
 				"The server has this operation turned off on purpose. It is not a permission problem: another profile or role will not get through. Whether to turn it on is the MT administrator's decision, so tell the user.")
+		case strings.Contains(e.Message, "limited to the users listed"):
+			// MtbPro を使えるユーザーが管理画面で絞られている（構築者だけ）。ロールの問題ではなく、
+			// 別のシステム管理者のプロファイルに持ち替えて通すのは、絞った意図をくぐることになる
+			return i18n.T(
+				"MtbPro を使えるユーザーが、MT の管理画面のプラグイン設定で絞られています。ロールの問題ではありません。ほかのプロファイルに持ち替えて回避せず、使えるようにするかを利用者に確かめてください（Data API からは変えられません）。",
+				"MtbPro is limited to certain users in the plugin settings of the MT admin screen. It is not a role problem. Do not work around it with another profile; ask the user whether to allow this user (it cannot be changed through the Data API).")
 		case strings.Contains(e.Message, "is disabled") && strings.Contains(e.Message, "can turn it on in the admin screen"):
 			// スイッチが OFF で、管理画面で ON にできる（MtbPro 0.5 からのスイッチの2段のうち、システム管理者の段）。
 			// Data API からは変えられないので、エージェントは開けずに利用者に伝える

@@ -25,6 +25,8 @@ func TestHintDependsOnTheMessage(t *testing.T) {
 		{403, `Object sync is disabled. A system administrator can turn it on in the admin screen (System > Plugins > MtbPro > Settings), or the server administrator with "MtbProAllowObjectSync 1" in mt-config.cgi.`, "admin screen"},
 		// サーバの管理者が mt-config.cgi で OFF に固定した段（管理画面では変えられない）
 		{403, `File upload is disabled. MtbProAllowFileUpload in mt-config.cgi (or the environment) turns it off; that is the server administrator's decision and it cannot be changed in the admin screen.`, "mt-config.cgi"},
+		// MtbPro 0.6: 使えるユーザーが絞られている。ロールの助言にしない
+		{403, "MtbPro is limited to the users listed in the MtbPro plugin settings, and 'admin' is not one of them. A system administrator can change the list in the admin screen (System > Plugins > MtbPro > Settings); it cannot be changed through the Data API.", "Do not work around it"},
 		{404, "Unknown endpoint", "no such endpoint"},
 		{404, "", "no such endpoint"},
 		{404, "Site not found", "does not exist"},
