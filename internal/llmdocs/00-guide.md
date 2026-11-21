@@ -306,7 +306,7 @@ diff -ru ./dump/prod ./dump/stg
 旧環境を DB ごと（ID ごと）写した本番に、写した後に旧環境で編集された分だけを足す移行は、
 **本体の手段ではできない。** 管理画面の取り込み（復元）は ID をすべて振り直し（空の DB でも 1 から）、
 Data API は ID も作成日・更新日も指定できない。**拡張 mtb-pro の `objects sync`**（MtbPro 0.4。
-`MtbProAllowObjectSync 1` が要る）が、比べてから ID・日時を保ったまま書く。使い方は `mtb llm` の拡張の章。
+移行のスイッチが要る。MtbPro 0.5 からは mt-config.cgi を触れなくても管理画面で ON にできる）が、比べてから ID・日時を保ったまま書く。使い方は `mtb llm` の拡張の章。
 
 - **復元（取り込み）すると更新日時が化ける。** 本体の `modified_by` の setter は `modified_on` を今の時刻にする。
   取り込みは列をハッシュの順に入れるので、`modified_by` が `modified_on` より後に入ったオブジェクトだけ
@@ -358,7 +358,7 @@ Git のファイルとして持ち、配置は rsync、適用と確認を mtb �
 一番きれい。**サイトから export するのではなく、ファイルからサイトを起こす。**
 
 **拡張 `mtb-pro` があれば rsync も要らない**（`mtb themes files upload <id> --dir <dir>`）。
-MT 側で `MtbProAllowFileUpload 1` が有効になっていることが条件（→「拡張」）。
+MT 側で MtbPro のファイルの書き込みのスイッチが ON であることが条件（mt-config.cgi の `MtbProAllowFileUpload` か管理画面。→「拡張」）。
 
 ```
 theme.yaml / templates/*.mtml / blog_static/<フォルダ>/...
@@ -1004,7 +1004,7 @@ mtb sites pages update 1 7 --page '{"status":"Publish","folder":{"id":4}}' --pub
 | 記事を取り下げた（原稿に戻した）・削除したのに、カテゴリの一覧に残る | カテゴリアーカイブは、取り下げや削除では書き出し直されない | そのブログを再構築する（`mtb publish` か、管理画面の［再構築］→「すべてのファイル」） |
 | `roles create` / `roles update` が通ったのに、ロールに権限が付いていない | 知らない権限名は**エラーにならず黙って捨てられる**。`permissions list` は権限名の一覧ではない | ロールは必ず `roles get` で読み戻して確かめる。コンテンツタイプ単位の権限は `manage_content_data:<タイプのUUID>`（スキル mt-cms-design の permissions.md） |
 | コンテンツタイプの「タグ」の欄に値を入れると 409「コンテンツデータとタグのリンクを作成できません」、タグを先に作って渡すと 500 | MT 9.3.1 で観測。API からはタグの欄に値を入れられなかった（500 の前にデータが途中まで保存されることもある） | 「リスト」の欄で代える。途中まで保存されたデータは消して入れ直す |
-| 403 で、メッセージが `mt-config.cgi` の設定を足せと言っている（`File upload is disabled. Add "MtbProAllowFileUpload 1" …` など） | MT のサーバの設定で無効 | 権限の問題ではない。ロールやプロファイルを変えても通らない。サーバの管理者（利用者）に伝える |
+| 403 で `File upload is disabled` / `Object sync is disabled` | MtbPro のスイッチが OFF（管理画面か mt-config.cgi。文面で分かる） | 権限の問題ではない。ロールやプロファイルを変えても通らない。利用者に伝える（Data API からは変えられない） |
 | 403 `turned off in the MtbPro plugin settings`（システム管理者なのに） | mtb-pro の MtbPro が運用時の設定でそのエンドポイントを閉じている | 権限の問題ではないので、プロファイルやロールを変えても通らない。Data API から開ける口は無い（わざと）。利用者に伝える。開いているものは `mtb endpoint-policy get` |
 | `users synchronize` / `groups synchronize` が 403（システム管理者なのに） | LDAP の外部ユーザー管理ではない | ロールでは直らない。`mt-config.cgi` の `AuthenticationModule LDAP` と `ExternalUserManagement 1` |
 | `users import` が「カラムの数が不正」 | `register` の行が13列でない | 後ろに空の列を足して13列にする |

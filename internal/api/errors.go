@@ -82,8 +82,15 @@ func (e *Error) Hint() string {
 			return i18n.T(
 				"サーバの設定でこの操作は止められています。権限の問題ではないので、プロファイルやロールを変えても通りません。開けるかどうかは MT の管理者が決めることなので、利用者に伝えてください。",
 				"The server has this operation turned off on purpose. It is not a permission problem: another profile or role will not get through. Whether to turn it on is the MT administrator's decision, so tell the user.")
+		case strings.Contains(e.Message, "is disabled") && strings.Contains(e.Message, "can turn it on in the admin screen"):
+			// スイッチが OFF で、管理画面で ON にできる（MtbPro 0.5 からのスイッチの2段のうち、システム管理者の段）。
+			// Data API からは変えられないので、エージェントは開けずに利用者に伝える
+			return i18n.T(
+				"この機能はスイッチで止められています（既定は OFF）。権限の問題ではありません。システム管理者が MT の管理画面（メッセージにある場所）で ON にできます。Data API からは変えられないので、ON にするかどうかを利用者に確かめてください。",
+				"This feature is switched off (off by default). It is not a permission problem. A system administrator can switch it on in the MT admin screen (where the message says). It cannot be changed through the Data API, so ask the user whether to switch it on.")
 		case strings.Contains(e.Message, "mt-config.cgi"):
-			// MT の設定で無効になっている（mtb-pro の MtbPro のファイル送信 MtbProAllowFileUpload など）。
+			// MT の設定で無効になっている（mtb-pro の MtbPro のスイッチをサーバの管理者が mt-config.cgi か環境変数で
+			// OFF に固定したときなど。管理画面では変えられない）。
 			// 文面がどの設定かを言っているので、ロールの助言を出さない（見当違いの方へ行かせない）
 			return i18n.T(
 				"MT のサーバの設定（mt-config.cgi）で無効になっています。権限の問題ではありません。メッセージにある設定を足せるのは MT のサーバの管理者なので、利用者に伝えてください。",
