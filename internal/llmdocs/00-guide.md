@@ -1022,6 +1022,7 @@ mtb sites pages update 1 7 --page '{"status":"Publish","folder":{"id":4}}' --pub
 | テーマのエクスポートが `success` なのに中身が空 | 静的ファイルの対象フォルダがサイトに保存されていない | 管理画面のテーマエクスポート画面でフォルダ名を保存する（本体の API からは設定できない）。拡張 `mtb-pro` の `sites theme-export-settings update`。テーマの適用で消える |
 | `mtb sites themes apply` が `--yes` だけで通らない | テンプレートの総入れ替えなので `--confirm <サイト名>` も要る | 対象を確かめてから名前を打つ |
 | アップロードが `500 unable to write to the "Upload Destination"` | サイトの配置先がウェブサーバから書けない | `mtb sites get <ID> --fields sitePath` の場所の権限を見る |
+| （mtb の外）管理画面に curl などでサインインするとダッシュボードではなくホームに戻される・エラー画面になる | MT 9 はブラウザの `Sec-Fetch-Site` が `same-origin` でないサインインを受け付けない（CSRF 対策）。`__mode=login` を送ると「不明なアクション: login」 | API で済むならそちらを使う。どうしても画面を叩くなら `Sec-Fetch-Site: same-origin` を付け、`username` と `password` だけを送る（`__mode` は付けない） |
 
 ## 拡張（MT プラグインが足したエンドポイントのコマンド）
 
