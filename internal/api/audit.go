@@ -35,6 +35,8 @@ type AuditRecord struct {
 	User       string         `json:"user"`
 	Error      string         `json:"error,omitempty"`
 	Write      bool           `json:"write"`
+	// Run は実行1回ごとの ID です。動作ログ（mtb logs）の同じ ID の行と対応します。
+	Run string `json:"run"`
 }
 
 // Auditor は監査ログの書き手です。プロファイル名や書き込み先を知っているのは
@@ -51,6 +53,16 @@ var auditSecret = regexp.MustCompile(`(?i)password|passwd|secret|token|session|a
 
 // auditNoise は監査ログに入れても意味のない、Data API の制御用パラメータです。
 var auditNoise = map[string]bool{"__method": true, "suppressResponseCodes": true}
+
+// IsSecretName は値を伏せるべき名前（パラメータ・フラグ・ヘッダ）かどうかです。
+func IsSecretName(name string) bool { return auditSecret.MatchString(name) }
+
+// RedactValue は値を残せる形にします。JSON の中の秘密を伏せ、limit 文字を超えれば
+// 切り詰めて元の長さと SHA-256 を添えます。
+func RedactValue(s string, limit int) string { return truncateAudit(redactJSON(s), limit) }
+
+// RedactValues はパラメータを残せる形にします（監査ログと同じ伏せ方）。
+func RedactValues(v url.Values) map[string]any { return auditValues(v) }
 
 // auditInfo は送信1回分の、監査ログに要る情報です。roundTrip に渡します。
 type auditInfo struct {

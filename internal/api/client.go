@@ -85,6 +85,8 @@ type Client struct {
 	// Auditor があれば、送ったリクエストごとに監査ログの1行を渡します
 	// （mtb のローカルの監査ログ。書き先と「読み取りも残すか」は Auditor が決めます）。
 	Auditor Auditor
+	// Log があれば、送信の試み・送り直しを動作ログ（mtb logs）に残します。
+	Log RunLogger
 }
 
 // AuditNoteHeader は作業の説明を送るヘッダです。
@@ -236,6 +238,10 @@ func (c *Client) Do(ctx context.Context, req Request) (*Response, error) {
 		cred, cerr := c.tokens().Credential()
 		if cerr == nil && cred.SessionID != "" {
 			if _, rerr := c.Refresh(ctx); rerr == nil {
+				// ログの文言は表示言語で変えない（機械が読むデータ）
+				c.logf("info", "retry", "401: refreshed the access token and resent", map[string]any{
+					"method": strings.ToUpper(req.Method), "path": c.versionedPath(req.Path),
+				})
 				resp, err = c.send(ctx, req, false)
 				if err != nil {
 					return nil, err
@@ -350,7 +356,10 @@ func (c *Client) send(ctx context.Context, req Request, noAuth bool) (*Response,
 // 送った結果は（成功でも失敗でも）監査ログに1行残します。
 func (c *Client) roundTrip(httpReq *http.Request, info auditInfo) (resp *Response, err error) {
 	started := c.now()
-	defer func() { c.audit(info, started, resp, err) }()
+	defer func() {
+		c.audit(info, started, resp, err)
+		c.logAttempt(httpReq, info, started, resp, err)
+	}()
 
 	if c.Trace != nil {
 		fmt.Fprintf(c.Trace, "> %s %s\n", httpReq.Method, httpReq.URL.String())

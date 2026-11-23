@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"sort"
 	"strconv"
 	"strings"
@@ -17,6 +14,7 @@ import (
 
 	"github.com/ideamans/mtb/internal/api"
 	"github.com/ideamans/mtb/internal/i18n"
+	"github.com/ideamans/mtb/internal/logs"
 )
 
 // ローカルの監査ログ。
@@ -27,26 +25,15 @@ import (
 // 行の形は MtbPro に合わせてあり、mtb studio もこのファイルを読みます。
 
 const (
-	// auditLogEnv は書き先です。パスか、off（残さない）。
+	// auditLogEnv が off なら監査ログを残しません。
 	auditLogEnv = "MTB_AUDIT_LOG"
 	// auditReadsEnv が 1 なら読み取り（GET）も残します。既定は書き込みだけ。
 	auditReadsEnv = "MTB_AUDIT_READS"
-	// auditDir は既定の置き場（設定ディレクトリの中）です。月ごとに1ファイル。
-	auditDir = "audit"
 )
 
-// auditLogPath は t の時点で書く先です。空なら残しません。
-func (a *App) auditLogPath(t time.Time) string {
-	v := strings.TrimSpace(a.env.getenv(auditLogEnv))
-	switch {
-	case strings.EqualFold(v, "off"):
-		return ""
-	case v != "":
-		return v
-	case a.env.Store == nil:
-		return ""
-	}
-	return a.env.Store.Location(auditDir + "/" + t.UTC().Format("2006-01") + ".jsonl")
+// auditOn は監査ログを残すかどうかです。
+func (a *App) auditOn() bool {
+	return !strings.EqualFold(strings.TrimSpace(a.env.getenv(auditLogEnv)), "off") && a.logStore() != nil
 }
 
 func (a *App) auditReads() bool {
@@ -63,31 +50,25 @@ type fileAuditor struct {
 	a       *App
 	profile string
 	user    func() string
-	warned  bool
 }
 
 func (f *fileAuditor) Record(r api.AuditRecord) {
 	if !r.Write && !f.a.auditReads() {
 		return
 	}
-	path := f.a.auditLogPath(f.a.env.now())
-	if path == "" || f.a.env.AppendFile == nil {
+	if !f.a.auditOn() {
 		return
 	}
 	r.Profile = f.profile
+	r.Run = f.a.runID
 	if f.user != nil {
 		r.User = f.user()
 	}
 	line, err := json.Marshal(r)
 	if err == nil {
-		err = f.a.env.AppendFile(path, append(line, '\n'))
+		err = f.a.logStore().Append(logs.Audit, line)
 	}
-	if err != nil && !f.warned {
-		f.warned = true
-		fmt.Fprintf(f.a.env.Err, i18n.T(
-			"警告: 監査ログを書けません（%s）: %v\n",
-			"warning: cannot write the audit log (%s): %v\n"), path, err)
-	}
+	f.a.logWarn(err)
 }
 
 // newHistoryCmd は mtb history です。
@@ -98,13 +79,17 @@ func (a *App) newHistoryCmd() *cobra.Command {
 		Long: i18n.T(
 			"mtb は送った Data API の呼び出しを手元の監査ログ（JSON Lines）に1行ずつ残します。\n"+
 				"既定は書き込み（GET 以外）だけで、MTB_AUDIT_READS=1 なら読み取りも残します。\n"+
-				"置き場は MTB_AUDIT_LOG（パス。off で残さない）、既定は設定ディレクトリの audit/<年-月>.jsonl です。\n"+
+				"置き場は設定ディレクトリの logs/audit/<日付>.jsonl です（MTB_LOG_DIR で logs/ ごと移せます。MTB_AUDIT_LOG=off で残さない）。\n"+
+				"2日以上前のファイルは gzip で圧縮し、30日より前のものは自動で消します。\n"+
+				"各行の run は実行の ID で、mtb logs --run で同じ実行の接続の様子を追えます。\n"+
 				"パスワード・トークン・セッションの値は伏せ、長い値は切り詰めて SHA-256 を添えます。\n\n"+
 				"これは「この端末の mtb が送ったもの」だけです。チーム全員の操作をサーバ側に残すのは\n"+
 				"MtbPro（mtb-pro 拡張の audit-logs で読む）の役目です。",
 			"mtb records each Data API call it sends in a local audit log (JSON Lines).\n"+
 				"By default only writes (anything but GET) are kept; set MTB_AUDIT_READS=1 to keep reads too.\n"+
-				"The location is MTB_AUDIT_LOG (a path, or off to disable); by default audit/<year-month>.jsonl in the config directory.\n"+
+				"It lives in logs/audit/<date>.jsonl under the config directory (move logs/ with MTB_LOG_DIR; MTB_AUDIT_LOG=off disables it).\n"+
+				"Files older than 2 days are gzipped and files older than 30 days are deleted automatically.\n"+
+				"Each line's run is the ID of the run; mtb logs --run shows what happened on the connection in that run.\n"+
 				"Passwords, tokens and session values are redacted; long values are truncated with their SHA-256.\n\n"+
 				"This only covers what mtb on this machine sent. Keeping everyone's operations on the server\n"+
 				"is what MtbPro does (read it with audit-logs from the mtb-pro extension)."),
@@ -127,6 +112,7 @@ type historyFilter struct {
 	writes       bool
 	limit        int
 	file         string
+	run          string
 }
 
 func (a *App) newHistoryListCmd() *cobra.Command {
@@ -153,52 +139,25 @@ func (a *App) newHistoryListCmd() *cobra.Command {
 	fl.StringVar(&f.note, "note", "", i18n.T("作業の説明（--audit-note）に含まれる文字列で絞る", "filter by a substring of the work description (--audit-note)"))
 	fl.BoolVar(&f.writes, "writes", false, i18n.T("書き込みだけ（読み取りを残している場合）", "writes only (when reads are being kept)"))
 	fl.IntVar(&f.limit, "limit", 50, i18n.T("新しい方から何件出すか（0 で全部）", "how many of the newest to show (0 for all)"))
-	fl.StringVar(&f.file, "file", "", i18n.T("読むファイル（既定は MTB_AUDIT_LOG か設定ディレクトリの audit/ 全部）", "file to read (default: MTB_AUDIT_LOG, or everything under audit/ in the config directory)"))
+	fl.StringVar(&f.file, "file", "", i18n.T("読むファイル（.jsonl か .jsonl.gz。既定は logs/audit/ の全部）", "file to read (.jsonl or .jsonl.gz; default: everything under logs/audit/)"))
+	fl.StringVar(&f.run, "run", "", i18n.T("1回の実行の ID で絞る（mtb logs --run と同じ ID）", "filter by the ID of one run (the same ID as mtb logs --run)"))
 	return cmd
 }
 
 func (a *App) newHistoryPathCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "path",
-		Short: i18n.T("監査ログの書き先を表示する", "Print where the audit log is written"),
+		Short: i18n.T("監査ログの置き場を表示する", "Print where the audit log is kept"),
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p := a.auditLogPath(a.env.now())
-			if p == "" {
+			if !a.auditOn() {
 				fmt.Fprintln(a.env.Err, i18n.T("監査ログは残していません（MTB_AUDIT_LOG=off）", "the audit log is off (MTB_AUDIT_LOG=off)"))
 				return nil
 			}
-			fmt.Fprintln(a.env.Out, p)
+			fmt.Fprintln(a.env.Out, a.logStore().KindDir(logs.Audit))
 			return nil
 		},
 	}
-}
-
-// historyFiles は読むファイルを古い順に返します。
-func (a *App) historyFiles(f historyFilter) ([]string, error) {
-	if f.file != "" {
-		return []string{f.file}, nil
-	}
-	if v := strings.TrimSpace(a.env.getenv(auditLogEnv)); v != "" && !strings.EqualFold(v, "off") {
-		return []string{v}, nil
-	}
-	if a.env.Store == nil || a.env.ListFiles == nil {
-		return nil, nil
-	}
-	dir := a.env.Store.Location(auditDir)
-	names, err := a.env.ListFiles(dir)
-	if err != nil {
-		// まだ1行も書いていない（ディレクトリが無い）のは誤りではない
-		return nil, nil
-	}
-	var out []string
-	for _, n := range names {
-		if strings.HasSuffix(n, ".jsonl") && !strings.Contains(n, "/") {
-			out = append(out, dir+"/"+n)
-		}
-	}
-	sort.Strings(out)
-	return out, nil
 }
 
 func (a *App) runHistory(f historyFilter, profile string) error {
@@ -211,10 +170,6 @@ func (a *App) runHistory(f historyFilter, profile string) error {
 	if err != nil {
 		return &usageError{fmt.Errorf("--until: %w", err)}
 	}
-	files, err := a.historyFiles(f)
-	if err != nil {
-		return err
-	}
 	methods := map[string]bool{}
 	for _, m := range strings.Split(f.method, ",") {
 		if m = strings.ToUpper(strings.TrimSpace(m)); m != "" {
@@ -223,25 +178,27 @@ func (a *App) runHistory(f historyFilter, profile string) error {
 	}
 
 	var recs []api.AuditRecord
-	for _, name := range files {
-		buf, err := a.env.ReadFile(name)
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				continue
-			}
-			return err
+	each := func(line []byte) {
+		var r api.AuditRecord
+		if json.Unmarshal(line, &r) != nil {
+			return // 途中で切れた行などは飛ばす
 		}
-		sc := bufio.NewScanner(bytes.NewReader(buf))
-		sc.Buffer(make([]byte, 64*1024), 16*1024*1024)
-		for sc.Scan() {
-			var r api.AuditRecord
-			if json.Unmarshal(sc.Bytes(), &r) != nil {
-				continue // 途中で切れた行などは飛ばす
-			}
-			if !keepRecord(r, f, methods, profile, since, until) {
-				continue
-			}
+		if keepRecord(r, f, methods, profile, since, until) {
 			recs = append(recs, r)
+		}
+	}
+	if l := a.logStore(); l != nil || f.file != "" {
+		if l == nil {
+			l = logs.New(a.env.LogFS, "", a.env.now)
+		}
+		var err error
+		if f.file != "" {
+			err = l.EachInFile(f.file, each)
+		} else {
+			err = l.Each(logs.Audit, each)
+		}
+		if err != nil {
+			return err
 		}
 	}
 	sort.SliceStable(recs, func(i, j int) bool { return recs[i].TS < recs[j].TS })
@@ -270,19 +227,22 @@ func (a *App) runHistory(f historyFilter, profile string) error {
 		return nil
 	}
 	w := tabwriter.NewWriter(a.env.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "TIME\tPROFILE\tMETHOD\tSTATUS\tMS\tPATH\tNOTE")
+	fmt.Fprintln(w, "TIME\tPROFILE\tMETHOD\tSTATUS\tMS\tPATH\tRUN\tNOTE")
 	for _, r := range recs {
 		status := strconv.Itoa(r.Status)
 		if r.Status == 0 {
 			status = "-"
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t%s\n", r.TS, dash(r.Profile), r.Method, status, r.MS, r.Path, r.Note)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\n", r.TS, dash(r.Profile), r.Method, status, r.MS, r.Path, dash(r.Run), r.Note)
 	}
 	return w.Flush()
 }
 
 func keepRecord(r api.AuditRecord, f historyFilter, methods map[string]bool, profile string, since, until time.Time) bool {
 	if f.writes && !r.Write {
+		return false
+	}
+	if f.run != "" && r.Run != f.run {
 		return false
 	}
 	if len(methods) > 0 && !methods[r.Method] {

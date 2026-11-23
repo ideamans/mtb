@@ -44,11 +44,21 @@ export MTB_AUDIT_NOTE="<what this task is, who asked, date>"
 ```
 
 mtb also keeps a local audit log of every write it sends (reads too with `MTB_AUDIT_READS=1`;
-location `MTB_AUDIT_LOG`, `off` disables it). Use it to report what you changed:
+it lives in `logs/audit/` under the config directory, `MTB_LOG_DIR` moves `logs/`,
+`MTB_AUDIT_LOG=off` disables it). Use it to report what you changed:
 
 ```bash
 mtb history --note "<the note above>" --writes
 mtb history --status error --since 1h
+```
+
+When something failed to connect, read the operation log instead: every run's attempts are kept
+with a failure class (`dns`, `tcp`, `tls`, `timeout`, `http`), and each history line's `run` ID
+links to it. Logs older than 30 days are gone.
+
+```bash
+mtb logs --format json          # warnings and errors from the last 24 hours
+mtb logs --run <run from history>
 ```
 
 It only covers this machine. Everyone's operations live on the server in MtbPro (`mtb audit-logs`).

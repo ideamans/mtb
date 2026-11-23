@@ -92,8 +92,14 @@ Permissions
 
 この mtb が送った Data API の呼び出しを見る（ローカルの監査ログ）
 
-- `mtb history list` `[--file --limit --method --note --path --since --status --until --writes]` — 監査ログの一覧（新しいものが下）
-- `mtb history path` — 監査ログの書き先を表示する
+- `mtb history list` `[--file --limit --method --note --path --run --since --status --until --writes]` — 監査ログの一覧（新しいものが下）
+- `mtb history path` — 監査ログの置き場を表示する
+
+## `mtb logs`
+
+mtb の動作ログを見る（接続の失敗・送り直し・終了コード）
+
+- `mtb logs path` — 動作ログの置き場を表示する
 - `mtb openapi` `[--fields --form --query]` — Retrieve OpenAPI schema
 
 ## `mtb permissions`

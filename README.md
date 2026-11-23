@@ -129,8 +129,11 @@ Webサービスパスワードを使うのは v3（MT 6.2）からです。
 | `MTB_CONFIG_DIR` | 設定ディレクトリ（既定 `~/.config/mtb`）。拡張は `extensions/` に入る |
 | `MTB_EXTENSIONS_PATH` | 入れずに読み込む拡張のディレクトリ（`:` 区切り。開発用） |
 | `MTB_AUDIT_NOTE` | 何の作業かの説明。全リクエストに `X-MTB-Audit-Note` ヘッダで付ける（`--audit-note` と同じ） |
-| `MTB_AUDIT_LOG` | ローカルの監査ログの書き先（パス）。`off` で残さない。既定は `<設定ディレクトリ>/audit/<年-月>.jsonl` |
+| `MTB_LOG_DIR` | 手元のログの置き場（既定は `<設定ディレクトリ>/logs`） |
+| `MTB_AUDIT_LOG` | `off` で監査ログ（`mtb history`）を残さない |
 | `MTB_AUDIT_READS` | `1` なら読み取り（GET）も監査ログに残す（既定は書き込みだけ） |
+| `MTB_LOG` | `off` で動作ログ（`mtb logs`）を残さない |
+| `MTB_LOG_LEVEL` | 動作ログに残す下限 `debug`/`info`/`warn`/`error`（既定 `info`。`debug` なら伏せたヘッダと切り詰めた本文も） |
 | `MTB_LANG` | 表示言語 `ja` / `en`（既定は `LC_ALL` → `LC_MESSAGES` → `LANG` から判定。いずれも無ければ英語） |
 
 **カレントディレクトリに `.env` があれば読み込みます。** 上の環境変数を
@@ -558,8 +561,7 @@ mtb sites entries create ...      # 以降の全リクエストに説明が付�
 
 **サーバに監査ログが無くても、手元には残ります（`mtb history`）。** mtb は送った Data API の
 呼び出しを1回1行の JSON Lines で手元に書きます。既定は書き込み（GET 以外）だけで、
-`MTB_AUDIT_READS=1` なら読み取りも。置き場は `MTB_AUDIT_LOG`（`off` で残さない）、
-既定は設定ディレクトリの `audit/<年-月>.jsonl`（権限 0600）。パスワード・トークン・セッションの
+`MTB_AUDIT_READS=1` なら読み取りも（`MTB_AUDIT_LOG=off` で残さない）。パスワード・トークン・セッションの
 値は伏せ、2000 文字を超える値は切り詰めて元の長さと SHA-256 を添え、アップロードは
 ファイル名・大きさ・SHA-256 だけを残します（MtbPro と同じ扱い）。書けなくてもコマンドは
 止めません（警告を1回出すだけ）。`--dry-run` は送らないので残りません。
@@ -567,12 +569,47 @@ mtb sites entries create ...      # 以降の全リクエストに説明が付�
 ```bash
 mtb history                                   # 新しい 50 件（新しいものが下）
 mtb history --since 7d --writes --status error
-mtb history --note "記事の移行" --format json  # 1行の項目: ts profile host apiVersion method path query params status ms note user error write
-mtb history path                              # いま書いている場所
+mtb history --note "記事の移行" --format json  # 1行の項目: ts profile host apiVersion method path query params status ms note user error write run
+mtb history path                              # 置き場
 ```
 
 手元のログは**その端末の mtb が送ったもの**だけです。チーム全員の操作をサーバ側でまとめて
 見るのは MtbPro（`mtb audit-logs`）の役目です。
+
+#### 手元のログ（監査ログと動作ログ）
+
+mtb は2種類のログを、設定と同じ場所（設定ディレクトリの `logs/`）に残します。
+**ふだん見るものではなく**、「何を変えたか」「なぜ失敗したか」をあとで調べるためのものです。
+
+| | 監査ログ `mtb history` | 動作ログ `mtb logs` |
+| --- | --- | --- |
+| 1行の単位 | Data API の呼び出し1回 | 出来事1つ（起動・接続先・送信の試み・送り直し・終了コード） |
+| 既定 | 書き込みだけ | `info` 以上 |
+| 止める | `MTB_AUDIT_LOG=off` | `MTB_LOG=off` |
+
+```
+~/.config/mtb/logs/            ← MTB_LOG_DIR で移せる
+├── .gitignore                 中身は "*"（~/.config を git で管理していても混ざらない）
+├── audit/2026-11-23.jsonl     UTC の日付ごと
+├── audit/2026-11-21.jsonl.gz  2日以上前は gzip
+└── run/2026-11-23.jsonl
+```
+
+- **両方の行に実行 ID（`run`）が入ります。** 監査ログの1行から、その実行で接続がどうだったか
+  （送り直し・タイムアウト）を `mtb logs --run <ID>` で辿れます
+- 送信の失敗は種類（`class`）を付けて残します: `dns` `tcp` `tls` `timeout` `http`
+- **2日以上前のファイルは gzip で圧縮し、30日より前のものは消します。** 片付けは常駐せず、
+  mtb を起動したときに1日1回だけ行います（日数はいまは変えられません）
+- **mtb を同時に何本動かしても行は混ざりません。** 1行は1回の書き込みで足し、圧縮とは
+  ファイルロック（flock）で分けます。ロックが取れなくても待ちすぎず、書くことを優先します
+- 書けなくてもコマンドは止めません（警告を1回出すだけ）。シェル補完の呼び出しは残しません
+
+```bash
+mtb logs                     # 直近24時間の警告とエラー
+mtb logs --run 01JD...       # 1回の実行をすべて
+mtb logs --level info --since 7d --format json
+mtb logs path
+```
 
 日本語はそのまま読める形で出ます。MT は `\uXXXX` にエスケープした JSON を
 返しますが、mtb が戻しています（バイト列そのものが要るときは `--format raw`）。

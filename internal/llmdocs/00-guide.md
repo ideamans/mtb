@@ -94,12 +94,22 @@ export MTB_AUDIT_NOTE="記事の移行（stg→本番、依頼: 2026-10-25）"
 
 **自分が何を送ったかは `mtb history` で見直せる**（サーバに監査ログが無くても）。mtb は送った
 呼び出しを手元の JSON Lines に残す。既定は書き込みだけ・`MTB_AUDIT_READS=1` で読み取りも。
-置き場は `MTB_AUDIT_LOG`（`off` で止める）か設定ディレクトリの `audit/<年-月>.jsonl`。
+置き場は設定ディレクトリの `logs/audit/`（`MTB_LOG_DIR` で `logs/` ごと移る。`MTB_AUDIT_LOG=off` で止める）。
 秘密の値は伏せてある。作業の最後に「何を変えたか」を報告するときの根拠に使う:
 
 ```bash
 mtb history --note "記事の移行" --writes          # この作業で書き込んだもの
 mtb history --status error --since 1h --format json
+```
+
+**なぜ失敗したか（つながらない・タイムアウト・送り直し）は `mtb logs` で見る。** 実行ごとの
+出来事を残す動作ログで、送信の失敗には種類（`class`: dns / tcp / tls / timeout / http）が付く。
+既定は直近24時間の警告とエラーだけ。監査ログの各行の `run` が実行 ID で、`mtb logs --run <ID>`
+でその実行のすべてを追える。2日以上前は gzip、30日より前は自動で消える（古い調べものには使えない）。
+
+```bash
+mtb logs --format json                    # 直近の失敗。class を見て、つながらないのか MT が断ったのかを分ける
+mtb logs --run <history の run の値>
 ```
 
 `--profile` は history では**絞り込み**として効く。チーム全員の操作（他の端末・他の人）は
@@ -965,6 +975,7 @@ mtb sites pages update 1 7 --page '{"status":"Publish","folder":{"id":4}}' --pub
 
 | 症状 | 原因 | 対処 |
 | --- | --- | --- |
+| 接続のエラーが一度だけ出て、もう再現しない | 手元では原因が残っていないと思い込んでいる | `mtb logs --since 1h --format json` の `class`（dns / tcp / tls / timeout）と `msg` を見る。`MTB_LOG_LEVEL=debug` で再実行すれば伏せたヘッダと本文も残る |
 | 401 Invalid login | サインインパスワードを使っている | Webサービスパスワードを確認する |
 | 401 Invalid login（接続先が MT 6.0・6.1 など v1・v2） | v1・v2 はサインインのパスワードを受け取る | `mtb profile show` の版が実物と合っているか見て、サインインのパスワードで入る |
 | 「Data API v4 以降の操作です。接続先は v3」（終了コード 5） | 接続先の版にその操作が無い（MT 6 にコンテンツタイプは無い） | 送っていない。別の手段を探すか、プロファイルの版が実物と合っているか（`mtb profile show`）確かめる |

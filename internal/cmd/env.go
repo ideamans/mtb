@@ -13,6 +13,7 @@ import (
 	"github.com/ideamans/mtb/internal/api"
 	"github.com/ideamans/mtb/internal/config"
 	"github.com/ideamans/mtb/internal/extension"
+	"github.com/ideamans/mtb/internal/logs"
 	"github.com/ideamans/mtb/internal/prompt"
 	"github.com/ideamans/mtb/internal/spec"
 )
@@ -64,9 +65,10 @@ type Env struct {
 	// CheckClaudePlugin は拡張に同梱した Claude Code のプラグインを検査し、問題を返します
 	// （版が拡張と一致するか、スキルの書式）。nil なら検査しません。
 	CheckClaudePlugin func(dir, version string) []string
-	// AppendFile はファイルの末尾に書き足します（無ければ作る）。監査ログに使います。
-	// nil なら監査ログを書きません。
-	AppendFile func(name string, data []byte) error
+	// LogFS は手元のログ（監査ログと動作ログ）の読み書きです。nil ならログを残しません。
+	LogFS logs.FS
+	// NewRunID は実行1回ごとの ID を作ります。nil なら時刻と乱数から作ります。
+	NewRunID func() string
 	// DotEnvPath は読み込んだ .env の場所です。読んでいなければ空。
 	// 表示のためだけに持ちます（mtb profile show）。
 	DotEnvPath string
@@ -130,22 +132,8 @@ func DefaultEnv() (*Env, error) {
 		return os.ReadFile(name)
 	}
 	env.RemoveAll = os.RemoveAll
-	// 監査ログは本人だけが読める権限で作る（送った値が残るため）。
-	// O_APPEND の1回の write で1行を書くので、並んで動く mtb どうしでも行は混ざらない。
-	env.AppendFile = func(name string, data []byte) error {
-		if err := os.MkdirAll(filepath.Dir(name), 0o700); err != nil {
-			return err
-		}
-		f, err := os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
-		if err != nil {
-			return err
-		}
-		if _, err := f.Write(data); err != nil {
-			_ = f.Close()
-			return err
-		}
-		return f.Close()
-	}
+	// ログは本人だけが読める権限で作る（送った値が残るため）。ロックと圧縮は logs.OSFS が受け持つ
+	env.LogFS = logs.OSFS{}
 	env.CheckClaudePlugin = func(dir, version string) []string {
 		return skillcheck.CheckDir(dir, skillcheck.Options{Version: version}).Problems
 	}

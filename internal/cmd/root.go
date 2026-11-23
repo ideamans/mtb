@@ -65,6 +65,9 @@ type App struct {
 	// loadedExtensions はツリーに足せた拡張、extensionErrors は足せなかった理由です。
 	loadedExtensions []*extension.Extension
 	extensionErrors  []error
+
+	// 手元のログ（監査ログと動作ログ）の状態
+	logState
 }
 
 // New はコマンドツリーを組み立てます。実行はしません。
@@ -144,6 +147,7 @@ func New(env *Env, args ...string) *App {
 		a.newDumpCmd(),
 		a.newExtensionsCmd(),
 		a.newHistoryCmd(),
+		a.newLogsCmd(),
 	)
 	a.addGeneratedCommands()
 	a.addTemplateSyncCommands()
@@ -159,9 +163,14 @@ func New(env *Env, args ...string) *App {
 func (a *App) Root() *cobra.Command { return a.root }
 
 // Execute はコマンドを実行します。
+//
+// 実行の始まりと終わり（終了コード）を動作ログに残します。
 func (a *App) Execute(args []string) error {
 	a.root.SetArgs(args)
-	return a.root.Execute()
+	a.beginRun(args)
+	err := a.root.Execute()
+	a.endRun(err)
+	return err
 }
 
 // Root はカタログ生成器のための入口です。実行せずにツリーだけを返します。
@@ -284,6 +293,10 @@ func (a *App) client() (*api.Client, error) {
 	if a.g.verbose {
 		c.Trace = a.env.Err
 	}
+	c.Log = runLogger{a}
+	a.log("info", "profile", "", map[string]any{
+		"profile": r.Name, "endpoint": r.BaseURL, "apiVersion": r.APIVersion, "fromFile": r.FromFile,
+	})
 	c.Auditor = &fileAuditor{a: a, profile: r.Name, user: func() string {
 		if r.Username != "" {
 			return r.Username

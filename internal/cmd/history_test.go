@@ -9,13 +9,16 @@ import (
 	"github.com/ideamans/mtb/internal/api"
 )
 
-// testAuditFile は固定時刻（2023-11）での既定の書き先です。
-const testAuditFile = "mem:audit/2023-11.jsonl"
+// testAuditFile は固定時刻（2023-11-14 UTC）での既定の書き先です。
+const testAuditFile = "mem:logs/audit/2023-11-14.jsonl"
+
+// testRunFile は同じ日の動作ログです。
+const testRunFile = "mem:logs/run/2023-11-14.jsonl"
 
 func auditLines(t *testing.T, h *harness, name string) []api.AuditRecord {
 	t.Helper()
 	var out []api.AuditRecord
-	for _, line := range strings.Split(strings.TrimSpace(h.files[name]), "\n") {
+	for _, line := range strings.Split(strings.TrimSpace(string(h.logfs.Files[name])), "\n") {
 		if line == "" {
 			continue
 		}
@@ -35,7 +38,7 @@ func TestWritesAreAuditedLocally(t *testing.T) {
 
 	recs := auditLines(t, h, testAuditFile)
 	if len(recs) != 1 {
-		t.Fatalf("記録 = %d 行、1行のはず: %q", len(recs), h.files[testAuditFile])
+		t.Fatalf("記録 = %d 行、1行のはず: %q", len(recs), string(h.logfs.Files[testAuditFile]))
 	}
 	r := recs[0]
 	if r.Method != "POST" || r.Path != "/v7/sites/1/entries" || r.Status != 200 || !r.Write {
@@ -55,7 +58,7 @@ func TestWritesAreAuditedLocally(t *testing.T) {
 func TestReadsAreAuditedOnlyWhenAsked(t *testing.T) {
 	h := newHarness(t).reply(okJSON(`{}`))
 	h.mustRun("sites", "entries", "list", "--site-id", "1")
-	if _, ok := h.files[testAuditFile]; ok {
+	if _, ok := h.logfs.Files[testAuditFile]; ok {
 		t.Fatal("既定では読み取りを残さないはず")
 	}
 
@@ -72,7 +75,7 @@ func TestAuditLogRedactsSecrets(t *testing.T) {
 	h.reply(okJSON(`{"accessToken":"a","sessionId":"s","expiresIn":3600}`))
 	h.mustRun("auth", "login", "--username", "alice")
 
-	raw := h.files[testAuditFile]
+	raw := string(h.logfs.Files[testAuditFile])
 	if strings.Contains(raw, "pw-should-not-appear") {
 		t.Fatalf("パスワードが監査ログに残っています: %s", raw)
 	}
@@ -83,7 +86,7 @@ func TestAuditLogRedactsSecrets(t *testing.T) {
 	// JSON の値の中のキーも伏せる
 	h = newHarness(t).reply(okJSON(`{}`))
 	h.mustRun("users", "create", "--user", `{"name":"bob","password":"inner-secret"}`)
-	if raw := h.files[testAuditFile]; strings.Contains(raw, "inner-secret") || !strings.Contains(raw, "bob") {
+	if raw := string(h.logfs.Files[testAuditFile]); strings.Contains(raw, "inner-secret") || !strings.Contains(raw, "bob") {
 		t.Errorf("JSON の中の秘密が伏せられていません: %s", raw)
 	}
 }
@@ -109,36 +112,53 @@ func TestAuditLogFailuresAreRecordedAndDoNotBreakCommands(t *testing.T) {
 
 	// 書けなくても止めない（警告だけ）
 	h = newHarness(t).reply(okJSON(`{}`))
-	h.env.AppendFile = func(string, []byte) error { return errors.New("disk full") }
+	h.logfs.FailAppend = errors.New("disk full")
 	h.mustRun("sites", "entries", "create", "--site-id", "1", "--entry", `{}`)
-	if !strings.Contains(h.errOut.String(), "監査ログを書けません") {
-		t.Errorf("警告が出ていません: %q", h.errOut.String())
+	if n := strings.Count(h.errOut.String(), "ログを書けません"); n != 1 {
+		t.Errorf("警告は1回だけのはず（%d 回）: %q", n, h.errOut.String())
 	}
 }
 
 func TestAuditLogLocationAndOff(t *testing.T) {
-	h := newHarness(t, withEnvVars(map[string]string{"MTB_AUDIT_LOG": "/work/.mtb/audit.jsonl"})).reply(okJSON(`{}`))
+	h := newHarness(t, withEnvVars(map[string]string{"MTB_LOG_DIR": "/work/.mtb/logs"})).reply(okJSON(`{}`))
 	h.mustRun("sites", "entries", "create", "--site-id", "1", "--entry", `{}`)
-	if len(auditLines(t, h, "/work/.mtb/audit.jsonl")) != 1 {
-		t.Error("MTB_AUDIT_LOG に書いていません")
+	if len(auditLines(t, h, "/work/.mtb/logs/audit/2023-11-14.jsonl")) != 1 {
+		t.Errorf("MTB_LOG_DIR に書いていません: %v", keys(h.logfs.Files))
 	}
-	if out := h.mustRun("history", "path"); strings.TrimSpace(out) != "/work/.mtb/audit.jsonl" {
+	if _, ok := h.logfs.Files["/work/.mtb/logs/.gitignore"]; !ok {
+		t.Error(".gitignore を置いていません")
+	}
+	if out := h.mustRun("history", "path"); strings.TrimSpace(out) != "/work/.mtb/logs/audit" {
 		t.Errorf("history path = %q", out)
+	}
+	if out := h.mustRun("logs", "path"); strings.TrimSpace(out) != "/work/.mtb/logs/run" {
+		t.Errorf("logs path = %q", out)
 	}
 
 	h = newHarness(t, withEnvVars(map[string]string{"MTB_AUDIT_LOG": "off"})).reply(okJSON(`{}`))
 	h.mustRun("sites", "entries", "create", "--site-id", "1", "--entry", `{}`)
-	for name := range h.files {
-		if strings.Contains(name, "audit") {
+	for name := range h.logfs.Files {
+		if strings.Contains(name, "/audit/") {
 			t.Errorf("off なのに書いています: %s", name)
 		}
 	}
+	if _, ok := h.logfs.Files[testRunFile]; !ok {
+		t.Error("監査ログを止めても動作ログは残るはず")
+	}
+}
+
+func keys(m map[string][]byte) []string {
+	var out []string
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
 }
 
 func TestDryRunIsNotAudited(t *testing.T) {
 	h := newHarness(t)
 	h.mustRun("sites", "entries", "create", "--site-id", "1", "--entry", `{}`, "--dry-run")
-	if _, ok := h.files[testAuditFile]; ok {
+	if _, ok := h.logfs.Files[testAuditFile]; ok {
 		t.Error("送っていないものを記録しています")
 	}
 }

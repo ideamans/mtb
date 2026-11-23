@@ -15,6 +15,7 @@ import (
 
 	"github.com/ideamans/mtb/internal/api"
 	"github.com/ideamans/mtb/internal/config"
+	"github.com/ideamans/mtb/internal/logs"
 	"github.com/ideamans/mtb/internal/prompt"
 	"github.com/ideamans/mtb/internal/spec"
 )
@@ -41,6 +42,8 @@ type recorded struct {
 type fakeDoer struct {
 	responses []stub
 	sent      []recorded
+	// err が非 nil なら送信そのものを失敗させます（つながらない場合の再現）
+	err error
 }
 
 func (f *fakeDoer) Do(req *http.Request) (*http.Response, error) {
@@ -53,6 +56,9 @@ func (f *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 		body = string(buf)
 	}
 	f.sent = append(f.sent, recorded{Method: req.Method, URL: req.URL.String(), Header: req.Header.Clone(), Body: body})
+	if f.err != nil {
+		return nil, f.err
+	}
 	if len(f.responses) == 0 {
 		return nil, errors.New("fakeDoer: 応答が足りません")
 	}
@@ -83,6 +89,9 @@ type harness struct {
 	written map[string][]byte
 	removed []string
 	envVars map[string]string
+	// logfs は手元のログ（mem:logs/ 以下）。runs は振った実行 ID の数
+	logfs *logs.MemFS
+	runs  int
 
 	lastInsecure bool
 	lastTimeout  time.Duration
@@ -122,6 +131,7 @@ func newHarness(t *testing.T, opts ...harnessOption) *harness {
 		prompt:  &prompt.Scripted{NotInteractive: true},
 		files:   map[string]string{},
 		written: map[string][]byte{},
+		logfs:   logs.NewMemFS(),
 		// テストの検査対象は日本語の文言です。英語は language_test.go で
 		// 別に確かめます。
 		envVars: map[string]string{"MTB_LANG": "ja"},
@@ -174,9 +184,10 @@ func newHarness(t *testing.T, opts ...harnessOption) *harness {
 			h.written[name] = data
 			return nil
 		},
-		AppendFile: func(name string, data []byte) error {
-			h.files[name] += string(data)
-			return nil
+		LogFS: h.logfs,
+		NewRunID: func() string {
+			h.runs++
+			return fmt.Sprintf("RUN%d", h.runs)
 		},
 		ExtensionsDir: "/config/extensions",
 		RemoveAll: func(path string) error {

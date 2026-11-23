@@ -28,7 +28,7 @@ cobra のツリーを組み立てる。生成されるのは 220 コマンド / 
 マニュアルへのリンクだけ。**マニュアルや定義の文を写して説明を補わないこと**
 （要約は自分の言葉で書く）。OSS として公開するための前提。
 
-手書きなのは `auth` / `profile` / `api` / `call` / `llm` / `dump` / `extensions` / `history`（ローカルの監査ログ。`internal/api/audit.go` が1行を作る）と、生成された
+手書きなのは `auth` / `profile` / `api` / `call` / `llm` / `dump` / `extensions` / `history` / `logs`（手元の監査ログと動作ログ。1行は `internal/api/audit.go` と `runlog.go` が作り、置き場・圧縮・ロックは `internal/logs`）と、生成された
 `sites templates` に足した `pull` / `push` だけ。**後者はエンドポイントでは
 ない**——Data API に一括の取り出し／書き戻しが無いので、mtb が list と update
 を回している（`--all` や `--dir` と同じ立場）。利用者はテンプレートの操作を
@@ -158,6 +158,8 @@ Data API を薄く包むことではない。**API の形をそのまま利用�
 | 認証情報の置き場 | `api.TokenStore` | `api.MemoryTokenStore` |
 | 時刻 | `Env.Now` | 固定時刻 |
 | 端末入力 | `prompt.Prompter` | `prompt.Scripted` |
+| 手元のログ（追記・圧縮・ロック） | `logs.FS`（`Env.LogFS`） | `logs.MemFS` |
+| 実行 ID | `Env.NewRunID` | `RUN1`, `RUN2`… |
 | 表示言語 | `Env.Getenv` / `--lang` | `withLang("en")` |
 | 入出力・ファイル読み書き | `cmd.Env` | バッファとマップ |
 
@@ -229,6 +231,13 @@ JSON を返す。そのまま出すと人が読めず、エージェントには
 から `internal/gen-skilldocs` が作る。MT 側のドキュメントが更新されたら
 `go run ./internal/gen-skilldocs -fetch` で原本を取り直してから `go generate`。
 **手で書き足したいときは SKILL.md か、mt-cms-design の references（目印の外）に書く。**
+
+**手元のログは「本来の作業を止めない」が最優先。** 書けなければ警告を1回出すだけ、
+ロックが取れなければ待ちすぎずに書く（楽観的）、片付け中なら飛ばす。置き場は設定と同じ
+ディレクトリの `logs/`（`MTB_LOG_DIR` だけで移せる）で、`~/.local/state` などへ分けない
+（「ここを見ればまとまっている」を優先した決定）。日数は `logs.Policy` に置き、
+**設定の口はまだ設けていない**。ログの文言（`msg`）は表示言語で変えない（機械が読むデータ）。
+行の JSON のキーは mtb studio が読む約束なので変えないこと。
 
 **生成の順番に意味がある。** `spec.json` を作り直してからでないと
 コマンドカタログが古いツリーから描かれる。spec.json は公式定義をネットワークから
