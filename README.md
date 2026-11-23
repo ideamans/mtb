@@ -129,6 +129,8 @@ Webサービスパスワードを使うのは v3（MT 6.2）からです。
 | `MTB_CONFIG_DIR` | 設定ディレクトリ（既定 `~/.config/mtb`）。拡張は `extensions/` に入る |
 | `MTB_EXTENSIONS_PATH` | 入れずに読み込む拡張のディレクトリ（`:` 区切り。開発用） |
 | `MTB_AUDIT_NOTE` | 何の作業かの説明。全リクエストに `X-MTB-Audit-Note` ヘッダで付ける（`--audit-note` と同じ） |
+| `MTB_AUDIT_LOG` | ローカルの監査ログの書き先（パス）。`off` で残さない。既定は `<設定ディレクトリ>/audit/<年-月>.jsonl` |
+| `MTB_AUDIT_READS` | `1` なら読み取り（GET）も監査ログに残す（既定は書き込みだけ） |
 | `MTB_LANG` | 表示言語 `ja` / `en`（既定は `LC_ALL` → `LC_MESSAGES` → `LANG` から判定。いずれも無ければ英語） |
 
 **カレントディレクトリに `.env` があれば読み込みます。** 上の環境変数を
@@ -553,6 +555,24 @@ mtb sites entries update 6 309 --entry '{"title":"…"}' --verify-publish
 export MTB_AUDIT_NOTE="記事の移行（stg→本番）"
 mtb sites entries create ...      # 以降の全リクエストに説明が付く
 ```
+
+**サーバに監査ログが無くても、手元には残ります（`mtb history`）。** mtb は送った Data API の
+呼び出しを1回1行の JSON Lines で手元に書きます。既定は書き込み（GET 以外）だけで、
+`MTB_AUDIT_READS=1` なら読み取りも。置き場は `MTB_AUDIT_LOG`（`off` で残さない）、
+既定は設定ディレクトリの `audit/<年-月>.jsonl`（権限 0600）。パスワード・トークン・セッションの
+値は伏せ、2000 文字を超える値は切り詰めて元の長さと SHA-256 を添え、アップロードは
+ファイル名・大きさ・SHA-256 だけを残します（MtbPro と同じ扱い）。書けなくてもコマンドは
+止めません（警告を1回出すだけ）。`--dry-run` は送らないので残りません。
+
+```bash
+mtb history                                   # 新しい 50 件（新しいものが下）
+mtb history --since 7d --writes --status error
+mtb history --note "記事の移行" --format json  # 1行の項目: ts profile host apiVersion method path query params status ms note user error write
+mtb history path                              # いま書いている場所
+```
+
+手元のログは**その端末の mtb が送ったもの**だけです。チーム全員の操作をサーバ側でまとめて
+見るのは MtbPro（`mtb audit-logs`）の役目です。
 
 日本語はそのまま読める形で出ます。MT は `\uXXXX` にエスケープした JSON を
 返しますが、mtb が戻しています（バイト列そのものが要るときは `--format raw`）。

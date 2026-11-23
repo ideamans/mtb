@@ -143,6 +143,7 @@ func New(env *Env, args ...string) *App {
 		a.newCallCmd(),
 		a.newDumpCmd(),
 		a.newExtensionsCmd(),
+		a.newHistoryCmd(),
 	)
 	a.addGeneratedCommands()
 	a.addTemplateSyncCommands()
@@ -283,6 +284,15 @@ func (a *App) client() (*api.Client, error) {
 	if a.g.verbose {
 		c.Trace = a.env.Err
 	}
+	c.Auditor = &fileAuditor{a: a, profile: r.Name, user: func() string {
+		if r.Username != "" {
+			return r.Username
+		}
+		if cred, err := tokens.Credential(); err == nil && cred != nil {
+			return cred.Username
+		}
+		return ""
+	}}
 	a.apiClient = c
 	return c, nil
 }

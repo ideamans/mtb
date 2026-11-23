@@ -174,6 +174,10 @@ func newHarness(t *testing.T, opts ...harnessOption) *harness {
 			h.written[name] = data
 			return nil
 		},
+		AppendFile: func(name string, data []byte) error {
+			h.files[name] += string(data)
+			return nil
+		},
 		ExtensionsDir: "/config/extensions",
 		RemoveAll: func(path string) error {
 			h.removed = append(h.removed, path)

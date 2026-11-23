@@ -92,6 +92,19 @@ mtb は `User-Agent: mtb/<版>` も名乗るので、Web サーバのログで�
 export MTB_AUDIT_NOTE="記事の移行（stg→本番、依頼: 2026-10-25）"
 ```
 
+**自分が何を送ったかは `mtb history` で見直せる**（サーバに監査ログが無くても）。mtb は送った
+呼び出しを手元の JSON Lines に残す。既定は書き込みだけ・`MTB_AUDIT_READS=1` で読み取りも。
+置き場は `MTB_AUDIT_LOG`（`off` で止める）か設定ディレクトリの `audit/<年-月>.jsonl`。
+秘密の値は伏せてある。作業の最後に「何を変えたか」を報告するときの根拠に使う:
+
+```bash
+mtb history --note "記事の移行" --writes          # この作業で書き込んだもの
+mtb history --status error --since 1h --format json
+```
+
+`--profile` は history では**絞り込み**として効く。チーム全員の操作（他の端末・他の人）は
+手元のログには無い。それは MtbPro の `mtb audit-logs` で見る。
+
 ## 認証
 
 ```bash

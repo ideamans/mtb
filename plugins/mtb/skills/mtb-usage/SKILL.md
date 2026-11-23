@@ -43,6 +43,16 @@ the `X-MTB-Audit-Note` header on every request, and servers that keep an audit l
 export MTB_AUDIT_NOTE="<what this task is, who asked, date>"
 ```
 
+mtb also keeps a local audit log of every write it sends (reads too with `MTB_AUDIT_READS=1`;
+location `MTB_AUDIT_LOG`, `off` disables it). Use it to report what you changed:
+
+```bash
+mtb history --note "<the note above>" --writes
+mtb history --status error --since 1h
+```
+
+It only covers this machine. Everyone's operations live on the server in MtbPro (`mtb audit-logs`).
+
 ## 2. Read the reference before composing commands
 
 ```bash

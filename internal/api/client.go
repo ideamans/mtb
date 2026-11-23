@@ -82,6 +82,9 @@ type Client struct {
 	// AuditNote は「何の作業か」の説明です。X-MTB-Audit-Note ヘッダで送り、
 	// サーバ側で監査ログを取っていれば（MtbPro など）一緒に残ります。
 	AuditNote string
+	// Auditor があれば、送ったリクエストごとに監査ログの1行を渡します
+	// （mtb のローカルの監査ログ。書き先と「読み取りも残すか」は Auditor が決めます）。
+	Auditor Auditor
 }
 
 // AuditNoteHeader は作業の説明を送るヘッダです。
@@ -269,6 +272,8 @@ func (c *Client) ensureToken(ctx context.Context) error {
 
 func (c *Client) send(ctx context.Context, req Request, noAuth bool) (*Response, error) {
 	method := strings.ToUpper(req.Method)
+	// 監査ログには __method で送る前の本来のメソッドと、送ったフォームそのものを残す
+	info := newAuditInfo(method, req.Path, req.Query, req.Form, req.Upload)
 	form := url.Values{}
 	for k, vs := range req.Form {
 		form[k] = append([]string(nil), vs...)
@@ -338,11 +343,15 @@ func (c *Client) send(ctx context.Context, req Request, noAuth bool) (*Response,
 	if c.Trace != nil && len(form) > 0 {
 		fmt.Fprintf(c.Trace, "> body: %s\n", redactForm(form).Encode())
 	}
-	return c.roundTrip(httpReq)
+	return c.roundTrip(httpReq, info)
 }
 
 // roundTrip は組み立て済みのリクエストを送り、本文を読み切って返します。
-func (c *Client) roundTrip(httpReq *http.Request) (*Response, error) {
+// 送った結果は（成功でも失敗でも）監査ログに1行残します。
+func (c *Client) roundTrip(httpReq *http.Request, info auditInfo) (resp *Response, err error) {
+	started := c.now()
+	defer func() { c.audit(info, started, resp, err) }()
+
 	if c.Trace != nil {
 		fmt.Fprintf(c.Trace, "> %s %s\n", httpReq.Method, httpReq.URL.String())
 	}

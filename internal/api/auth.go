@@ -111,7 +111,7 @@ func (c *Client) Refresh(ctx context.Context) (*config.Credential, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.roundTrip(req)
+	resp, err := c.roundTrip(req, newAuditInfo(http.MethodPost, "/token", nil, form, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (c *Client) Logout(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		resp, err := c.roundTrip(req)
+		resp, err := c.roundTrip(req, newAuditInfo(http.MethodDelete, "/authentication", nil, form, nil))
 		if err != nil {
 			return err
 		}

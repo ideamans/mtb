@@ -34,6 +34,9 @@ func Open(env Environ, home func() (string, error)) (*Store, error) {
 // ConfigPath は config.json の場所です（表示用）。
 func (s *Store) ConfigPath() string { return s.storage.Location(ConfigFile) }
 
+// Location は設定ディレクトリの中の name の場所です（監査ログの既定の置き場に使う）。
+func (s *Store) Location(name string) string { return s.storage.Location(name) }
+
 // CredentialsPath は credentials.json の場所です（表示用）。
 func (s *Store) CredentialsPath() string { return s.storage.Location(CredentialsFile) }
 

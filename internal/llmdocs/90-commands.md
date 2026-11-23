@@ -87,6 +87,13 @@ Permissions
 - `mtb groups permissions revoke [group-id]` `[--fields --form --group-id --query --role-id --site-id]` — Revoke permissions from group
 - `mtb groups synchronize` `[--fields --form --query]` — Synchronize groups
 - `mtb groups update [group-id]` `[--fields --form --group --group-id --query --set --set-json]` — Update a group
+
+## `mtb history`
+
+この mtb が送った Data API の呼び出しを見る（ローカルの監査ログ）
+
+- `mtb history list` `[--file --limit --method --note --path --since --status --until --writes]` — 監査ログの一覧（新しいものが下）
+- `mtb history path` — 監査ログの書き先を表示する
 - `mtb openapi` `[--fields --form --query]` — Retrieve OpenAPI schema
 
 ## `mtb permissions`
