@@ -113,6 +113,8 @@ type historyFilter struct {
 	limit        int
 	file         string
 	run          string
+	grep         []string
+	count        bool
 }
 
 func (a *App) newHistoryListCmd() *cobra.Command {
@@ -141,6 +143,9 @@ func (a *App) newHistoryListCmd() *cobra.Command {
 	fl.IntVar(&f.limit, "limit", 50, i18n.T("新しい方から何件出すか（0 で全部）", "how many of the newest to show (0 for all)"))
 	fl.StringVar(&f.file, "file", "", i18n.T("読むファイル（.jsonl か .jsonl.gz。既定は logs/audit/ の全部）", "file to read (.jsonl or .jsonl.gz; default: everything under logs/audit/)"))
 	fl.StringVar(&f.run, "run", "", i18n.T("1回の実行の ID で絞る（mtb logs --run と同じ ID）", "filter by the ID of one run (the same ID as mtb logs --run)"))
+	fl.StringArrayVar(&f.grep, "grep", nil, grepHelp())
+	fl.BoolVar(&f.count, "count", false, countHelp())
+	// --profile（全体のフラグ）は、そのプロファイルで送った呼び出しだけに絞る
 	return cmd
 }
 
@@ -177,8 +182,12 @@ func (a *App) runHistory(f historyFilter, profile string) error {
 		}
 	}
 
+	words := grepWords(f.grep)
 	var recs []api.AuditRecord
 	each := func(line []byte) {
+		if !grepMatch(line, words) {
+			return
+		}
 		var r api.AuditRecord
 		if json.Unmarshal(line, &r) != nil {
 			return // 途中で切れた行などは飛ばす
@@ -202,6 +211,10 @@ func (a *App) runHistory(f historyFilter, profile string) error {
 		}
 	}
 	sort.SliceStable(recs, func(i, j int) bool { return recs[i].TS < recs[j].TS })
+	if f.count {
+		_, err = fmt.Fprintln(a.env.Out, len(recs))
+		return err
+	}
 	if f.limit > 0 && len(recs) > f.limit {
 		recs = recs[len(recs)-f.limit:]
 	}

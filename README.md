@@ -626,6 +626,23 @@ mtb logs --level info --since 7d --format json
 mtb logs path
 ```
 
+**探す・絞る**は両方のコマンドで同じです。
+
+| フラグ | 効き方 |
+| --- | --- |
+| `--grep <語>` | 1行の中身すべて（パス・パラメータの値・作業の説明・エラーの文）から、大文字小文字を区別せずに部分一致で探す。空白区切りや繰り返しはすべてを含むもの（AND） |
+| `--profile <名前>` | history はそのプロファイルへの呼び出し、logs はそのプロファイルを使った実行を丸ごと |
+| `--count` | 該当する件数だけを出す（`--limit` は効かない） |
+| `--level all` | logs で全部の重さを出す（既定は warn 以上。`--run` を付けたら all） |
+
+```bash
+mtb history --grep "春のキャンペーン" --profile prod
+mtb logs --profile prod --grep timeout --since 7d --count
+```
+
+`--format json` はファイルの1行と同じキーのオブジェクトの配列です。読むほうは
+`MTB_LOG=off` / `MTB_AUDIT_LOG=off` でも止まりません（止まるのは書くほうだけ）。
+
 日本語はそのまま読める形で出ます。MT は `\uXXXX` にエスケープした JSON を
 返しますが、mtb が戻しています（バイト列そのものが要るときは `--format raw`）。
 

@@ -92,7 +92,7 @@ Permissions
 
 この mtb が送った Data API の呼び出しを見る（ローカルの監査ログ）
 
-- `mtb history list` `[--file --limit --method --note --path --run --since --status --until --writes]` — 監査ログの一覧（新しいものが下）
+- `mtb history list` `[--count --file --grep --limit --method --note --path --run --since --status --until --writes]` — 監査ログの一覧（新しいものが下）
 - `mtb history path` — 監査ログの置き場を表示する
 
 ## `mtb logs`

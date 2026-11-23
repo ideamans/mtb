@@ -85,7 +85,13 @@ func (r runLogger) Log(level, event, msg string, fields map[string]any) {
 	if !a.runLogOn() || levelRank[level] < a.logLevel() {
 		return
 	}
-	a.logWarn(a.logStore().Append(logs.Run, runLine(a.env.now(), a.runID, level, event, msg, fields)))
+	// どの行にも、その時点で解決済みのプロファイル名を付ける（解決前の start などは ""）
+	f := make(map[string]any, len(fields)+1)
+	for k, v := range fields {
+		f[k] = v
+	}
+	f["profile"] = a.runProfile
+	a.logWarn(a.logStore().Append(logs.Run, runLine(a.env.now(), a.runID, level, event, msg, f)))
 }
 
 // runLine は動作ログの1行です。先頭に ts run level event msg を置き、残りは名前の順。
@@ -214,11 +220,12 @@ type runEntry struct {
 	Event string `json:"event"`
 	Msg   string `json:"msg"`
 	// 一覧の1行にまとめるための項目
-	Method string `json:"method"`
-	Path   string `json:"path"`
-	Status int    `json:"status"`
-	Class  string `json:"class"`
-	Exit   *int   `json:"exit"`
+	Method  string `json:"method"`
+	Path    string `json:"path"`
+	Status  int    `json:"status"`
+	Class   string `json:"class"`
+	Exit    *int   `json:"exit"`
+	Profile string `json:"profile"`
 
 	raw json.RawMessage
 }
@@ -226,6 +233,8 @@ type runEntry struct {
 type logsFilter struct {
 	since, level, run string
 	limit             int
+	grep              []string
+	count             bool
 }
 
 func (a *App) newLogsCmd() *cobra.Command {
@@ -249,13 +258,22 @@ func (a *App) newLogsCmd() *cobra.Command {
 				"With MTB_LOG_LEVEL=debug it also keeps redacted headers and truncated bodies.\n"+
 				"Files older than 2 days are gzipped and files older than 30 days are deleted automatically."),
 		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error { return a.runLogs(f) },
+		RunE: func(cmd *cobra.Command, args []string) error {
+			profile := ""
+			if fl := cmd.Flags().Lookup("profile"); fl != nil && fl.Changed {
+				profile = a.g.profile
+			}
+			return a.runLogs(f, profile)
+		},
 	}
 	fl := cmd.Flags()
 	fl.StringVar(&f.since, "since", "", i18n.T("この時刻以降（既定 24h。--run を付けたら全期間）", "from this time (default 24h; all time with --run)"))
-	fl.StringVar(&f.level, "level", "", i18n.T("この重さ以上 debug|info|warn|error（既定 warn。--run を付けたら debug）", "this level and above: debug|info|warn|error (default warn; debug with --run)"))
+	fl.StringVar(&f.level, "level", "", i18n.T("この重さ以上 debug|info|warn|error|all（既定 warn。--run を付けたら all）", "this level and above: debug|info|warn|error|all (default warn; all with --run)"))
 	fl.StringVar(&f.run, "run", "", i18n.T("1回の実行の ID（mtb history にも出ます）", "the ID of one run (also shown by mtb history)"))
 	fl.IntVar(&f.limit, "limit", 100, i18n.T("新しい方から何件出すか（0 で全部）", "how many of the newest to show (0 for all)"))
+	fl.StringArrayVar(&f.grep, "grep", nil, grepHelp())
+	fl.BoolVar(&f.count, "count", false, countHelp())
+	// --profile（全体のフラグ）は、その接続先を使った実行だけに絞る
 	cmd.AddCommand(&cobra.Command{
 		Use:   "path",
 		Short: i18n.T("動作ログの置き場を表示する", "Print where the operation log is kept"),
@@ -272,7 +290,7 @@ func (a *App) newLogsCmd() *cobra.Command {
 	return cmd
 }
 
-func (a *App) runLogs(f logsFilter) error {
+func (a *App) runLogs(f logsFilter, profile string) error {
 	now := a.env.now()
 	sinceArg, levelArg := f.since, f.level
 	if f.run == "" {
@@ -288,18 +306,27 @@ func (a *App) runLogs(f logsFilter) error {
 		return &usageError{fmt.Errorf("--since: %w", err)}
 	}
 	minLevel := 0
-	if levelArg != "" {
+	if levelArg != "" && !strings.EqualFold(levelArg, "all") {
 		r, ok := levelRank[strings.ToLower(levelArg)]
 		if !ok {
-			return usagef("%s", i18n.T("--level は debug|info|warn|error のどれかです", "--level must be one of debug|info|warn|error"))
+			return usagef("%s", i18n.T("--level は debug|info|warn|error|all のどれかです", "--level must be one of debug|info|warn|error|all"))
 		}
 		minLevel = r
 	}
+	words := grepWords(f.grep)
 	var entries []runEntry
+	// --profile: そのプロファイルを使った実行（run）を集め、実行ごと残す（start の行はまだ解決前なので）
+	profileRuns := map[string]bool{}
 	if l := a.logStore(); l != nil {
 		err = l.Each(logs.Run, func(line []byte) {
 			var e runEntry
 			if json.Unmarshal(line, &e) != nil {
+				return
+			}
+			if profile != "" && e.Profile == profile {
+				profileRuns[e.Run] = true
+			}
+			if !grepMatch(line, words) {
 				return
 			}
 			if f.run != "" && e.Run != f.run {
@@ -320,7 +347,20 @@ func (a *App) runLogs(f logsFilter) error {
 			return err
 		}
 	}
+	if profile != "" {
+		kept := entries[:0]
+		for _, e := range entries {
+			if profileRuns[e.Run] {
+				kept = append(kept, e)
+			}
+		}
+		entries = kept
+	}
 	sort.SliceStable(entries, func(i, j int) bool { return entries[i].TS < entries[j].TS })
+	if f.count {
+		_, err = fmt.Fprintln(a.env.Out, len(entries))
+		return err
+	}
 	if f.limit > 0 && len(entries) > f.limit {
 		entries = entries[len(entries)-f.limit:]
 	}
@@ -383,4 +423,6 @@ type logState struct {
 	runID     string
 	started   time.Time
 	quietRun  bool
+	// runProfile は解決したプロファイル名です（動作ログの各行に付ける）
+	runProfile string
 }

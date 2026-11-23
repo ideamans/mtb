@@ -112,6 +112,19 @@ mtb logs --format json                    # 直近の失敗。class を見て、
 mtb logs --run <history の run の値>
 ```
 
+**探すときは `--grep` と `--profile`。** 両方のコマンドで同じに効く。`--grep` は1行の中身すべて
+（パス・パラメータの値・作業の説明・エラーの文）を大文字小文字を区別せずに部分一致で探し、空白区切りや
+繰り返しは AND。`--profile` は history ではその接続先への呼び出しだけ、logs では**その接続先を使った実行を丸ごと**
+（解決前の start の行も）残す。件数だけなら `--count`（`--limit` は効かない）。logs で全部の重さを見るなら `--level all`。
+
+```bash
+mtb history --grep "キャンペーン" --profile prod --format json   # その記事を触った呼び出し
+mtb logs --profile prod --grep timeout --since 7d --count
+```
+
+`--format json` は**ファイルの1行と同じキーのオブジェクトの配列**（形は変えない）。読むだけのコマンドで
+自分の実行を書き足したくないなら `MTB_LOG=off`（読むほうは止まらない。`MTB_AUDIT_LOG=off` も同じ）。
+
 `--profile` は history では**絞り込み**として効く。チーム全員の操作（他の端末・他の人）は
 手元のログには無い。それは MtbPro の `mtb audit-logs` で見る。
 

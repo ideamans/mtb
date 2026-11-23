@@ -61,6 +61,15 @@ mtb logs --format json          # warnings and errors from the last 24 hours
 mtb logs --run <run from history>
 ```
 
+Both commands take `--grep <words>` (case-insensitive, matches anywhere in the entry — path,
+parameter values, note, error; several words must all match) and `--profile <name>` (history: calls
+to that profile; logs: whole runs that used it). `--count` prints just the number of matches.
+
+```bash
+mtb history --grep "spring campaign" --profile prod
+mtb logs --profile prod --grep timeout --since 7d --level all
+```
+
 It only covers this machine. Everyone's operations live on the server in MtbPro (`mtb audit-logs`).
 
 `mtb upgrade` replaces mtb itself with the latest GitHub release. Run it only when the user asks

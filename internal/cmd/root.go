@@ -26,7 +26,7 @@ import (
 // plugins/mtb/.claude-plugin/plugin.json の version と
 // 一致していることをテストが、git タグと一致していることをリリース
 // ワークフローが検査します。
-const PluginVersion = "0.3.0"
+const PluginVersion = "0.3.1"
 
 // Version はビルド時に -ldflags で上書きされるバージョン文字列です。
 var Version = PluginVersion
@@ -299,6 +299,8 @@ func (a *App) client() (*api.Client, error) {
 		c.Trace = a.env.Err
 	}
 	c.Log = runLogger{a}
+	// ここから後の動作ログの行には、解決したプロファイル名が付く（mtb logs --profile で実行ごと絞るため）
+	a.runProfile = r.Name
 	a.log("info", "profile", "", map[string]any{
 		"profile": r.Name, "endpoint": r.BaseURL, "apiVersion": r.APIVersion, "fromFile": r.FromFile,
 	})

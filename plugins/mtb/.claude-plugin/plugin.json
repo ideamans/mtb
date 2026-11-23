@@ -1,7 +1,7 @@
 {
   "name": "mtb",
   "description": "Makes Claude a Movable Type site builder: the mtb CLI builds MT sites from the command line — templates, categories, custom fields, assets and content — on top of the Data API v7, plus skills for developing themes as files, migrating a design between servers, and reference skills for MT's object model, roles and permissions, archive types, and all 614 template tags and 48 global modifiers.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "Ideamans Inc.",
     "email": "support@ideamans.com"
