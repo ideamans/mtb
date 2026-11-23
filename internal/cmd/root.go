@@ -26,7 +26,7 @@ import (
 // plugins/mtb/.claude-plugin/plugin.json の version と
 // 一致していることをテストが、git タグと一致していることをリリース
 // ワークフローが検査します。
-const PluginVersion = "0.2.0"
+const PluginVersion = "0.3.0"
 
 // Version はビルド時に -ldflags で上書きされるバージョン文字列です。
 var Version = PluginVersion
