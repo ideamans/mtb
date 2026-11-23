@@ -31,6 +31,10 @@ const PluginVersion = "0.2.0"
 // Version はビルド時に -ldflags で上書きされるバージョン文字列です。
 var Version = PluginVersion
 
+// BuildChannel はリリースの配布物なら "release" です（goreleaser が -ldflags で入れる）。
+// 空ならソースからのビルドで、mtb upgrade は入れ替えを断ります（どの版か保証できないため）。
+var BuildChannel = ""
+
 // globals は全コマンド共通のフラグです。
 type globals struct {
 	profile        string
@@ -148,6 +152,7 @@ func New(env *Env, args ...string) *App {
 		a.newExtensionsCmd(),
 		a.newHistoryCmd(),
 		a.newLogsCmd(),
+		a.newUpgradeCmd(),
 	)
 	a.addGeneratedCommands()
 	a.addTemplateSyncCommands()

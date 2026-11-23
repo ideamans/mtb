@@ -15,6 +15,7 @@ import (
 	"github.com/ideamans/mtb/internal/extension"
 	"github.com/ideamans/mtb/internal/logs"
 	"github.com/ideamans/mtb/internal/prompt"
+	"github.com/ideamans/mtb/internal/selfupdate"
 	"github.com/ideamans/mtb/internal/spec"
 )
 
@@ -69,6 +70,12 @@ type Env struct {
 	LogFS logs.FS
 	// NewRunID は実行1回ごとの ID を作ります。nil なら時刻と乱数から作ります。
 	NewRunID func() string
+	// Executable は動いている実行ファイルの実体のパスです（mtb upgrade が入れ替える先）。
+	Executable func() (string, error)
+	// SelfFS は mtb upgrade が実行ファイルを入れ替えるときのファイル操作です。
+	SelfFS selfupdate.FS
+	// GOOS・GOARCH は落とす配布物を選ぶための OS と CPU です。空なら動いているもの。
+	GOOS, GOARCH string
 	// DotEnvPath は読み込んだ .env の場所です。読んでいなければ空。
 	// 表示のためだけに持ちます（mtb profile show）。
 	DotEnvPath string
@@ -132,6 +139,8 @@ func DefaultEnv() (*Env, error) {
 		return os.ReadFile(name)
 	}
 	env.RemoveAll = os.RemoveAll
+	env.Executable = selfupdate.Executable
+	env.SelfFS = selfupdate.OSFS{}
 	// ログは本人だけが読める権限で作る（送った値が残るため）。ロックと圧縮は logs.OSFS が受け持つ
 	env.LogFS = logs.OSFS{}
 	env.CheckClaudePlugin = func(dir, version string) []string {

@@ -42,6 +42,21 @@ curl -fsSL https://bin.ideamans.com/install/mtb.sh | bash
 go install github.com/ideamans/mtb/cmd/mtb@latest
 ```
 
+### 更新する（mtb upgrade）
+
+```bash
+mtb upgrade --check   # 最新版を調べるだけ
+mtb upgrade           # GitHub のリリースから入れ替える
+```
+
+- 最新版は GitHub のリリース（`ideamans/mtb`）で調べ、配布物の SHA-256 を `checksums.txt` と照らしてから、
+  実行ファイルの隣に書いて rename で置き換えます（Windows は元を `mtb.exe.old` へ退かします）。
+- **apt・yum・Homebrew・Scoop・Chocolatey で入れたものは書き換えません。** 打つべきコマンドを案内します。
+- ソースからのビルド（`go install` など）は入れ替えません。
+- **更新元に届かない・見つからない・照合できないときは何も変えずに終わります。** 配布の仕組みが
+  変わって `mtb upgrade` が働かなくなったら、<https://www.mtbcli.com/guide/install> の手順で入れ直してください。
+- 自動で確認したり通知したりはしません。
+
 ## 接続先（プロファイル）
 
 MT は複数台あるのが普通なので、接続先に名前を付けて切り替えます。

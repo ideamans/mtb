@@ -673,6 +673,7 @@ Themes
 - `mtb themes delete [theme-id]` `[--fields --form --query --theme-id]` — Uninstall a specified theme from the MT
 - `mtb themes get [theme-id]` `[--fields --form --query --theme-id]` — Retrieve a single theme by its ID
 - `mtb themes list` `[--fields --form --query]` — Retrieve a list of themes
+- `mtb upgrade` `[--check]` — mtb を最新版に入れ替える（GitHub のリリースから）
 
 ## `mtb users`
 

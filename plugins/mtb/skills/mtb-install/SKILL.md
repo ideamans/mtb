@@ -29,6 +29,22 @@ Two checks before trusting the hit:
 Continue past this section only when the command is missing, is the wrong tool,
 is too old, or the user explicitly asked to update.
 
+**When the user asked to update an existing mtb, try `mtb upgrade` first** (it exists from
+the version after 0.2.0; on older binaries go on to route 2).
+
+```bash
+mtb upgrade --check --format json   # status: available / up-to-date / package-manager / source-build
+mtb upgrade                          # replaces the binary from the GitHub release (checksum-verified)
+```
+
+- `package-manager`: it was installed with apt, yum, Homebrew, Scoop or Chocolatey. mtb does not
+  touch it; run (or show the user) the command in `commands`.
+- `source-build`: run `go install github.com/ideamans/mtb/cmd/mtb@latest` (route 4).
+- A non-zero exit mentioning the update source means nothing was changed and the
+  source could not be used — reinstall with route 2.
+- Permission denied on the executable's directory: ask the user to run `sudo mtb upgrade`.
+- Never upgrade inside an mtb studio sandbox; its version is pinned by the image.
+
 ## Route 2 — the install script (bin.ideamans.com)
 
 The usual route. It picks the archive for the OS and CPU, checks the SHA-256 and

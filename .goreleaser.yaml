@@ -6,7 +6,7 @@ builds:
   - main: ./cmd/mtb
     binary: mtb
     ldflags:
-      - -s -w -X github.com/ideamans/mtb/internal/cmd.Version={{ .Version }}
+      - -s -w -X github.com/ideamans/mtb/internal/cmd.Version={{ .Version }} -X github.com/ideamans/mtb/internal/cmd.BuildChannel=release
     env:
       - CGO_ENABLED=0
     goos:

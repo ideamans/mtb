@@ -115,6 +115,13 @@ mtb logs --run <history の run の値>
 `--profile` は history では**絞り込み**として効く。チーム全員の操作（他の端末・他の人）は
 手元のログには無い。それは MtbPro の `mtb audit-logs` で見る。
 
+**mtb 本体の更新は `mtb upgrade`。ただし利用者が頼んだときだけ打つ。** 実行ファイルを入れ替える
+操作なので、作業の途中で勝手に上げない。版を確かめるだけなら `mtb upgrade --check --format json`
+（`status`: up-to-date / available / package-manager / source-build / newer-local）。
+apt・yum・Homebrew などで入れたものは書き換えず、`commands` に打つべきコマンドを返す（それを利用者に伝える）。
+更新元に届かないときは何も変えずに 0 以外で終わる — そのときは https://www.mtbcli.com/guide/install の
+手順で入れ直すよう伝える。**mtb studio の隔離環境は版を固定している**ので、そこでは打たない。
+
 ## 認証
 
 ```bash

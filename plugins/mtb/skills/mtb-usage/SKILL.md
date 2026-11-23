@@ -63,6 +63,9 @@ mtb logs --run <run from history>
 
 It only covers this machine. Everyone's operations live on the server in MtbPro (`mtb audit-logs`).
 
+`mtb upgrade` replaces mtb itself with the latest GitHub release. Run it only when the user asks
+(`mtb upgrade --check` just reports); see the mtb-install skill.
+
 ## 2. Read the reference before composing commands
 
 ```bash

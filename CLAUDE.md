@@ -28,7 +28,7 @@ cobra のツリーを組み立てる。生成されるのは 220 コマンド / 
 マニュアルへのリンクだけ。**マニュアルや定義の文を写して説明を補わないこと**
 （要約は自分の言葉で書く）。OSS として公開するための前提。
 
-手書きなのは `auth` / `profile` / `api` / `call` / `llm` / `dump` / `extensions` / `history` / `logs`（手元の監査ログと動作ログ。1行は `internal/api/audit.go` と `runlog.go` が作り、置き場・圧縮・ロックは `internal/logs`）と、生成された
+手書きなのは `auth` / `profile` / `api` / `call` / `llm` / `dump` / `extensions` / `history` / `logs`（手元の監査ログと動作ログ。1行は `internal/api/audit.go` と `runlog.go` が作り、置き場・圧縮・ロックは `internal/logs`） / `upgrade`（自分の入れ替え。中身は `internal/selfupdate`。リリースの配布物だけが goreleaser の `BuildChannel=release` を持ち、それ以外は入れ替えない）と、生成された
 `sites templates` に足した `pull` / `push` だけ。**後者はエンドポイントでは
 ない**——Data API に一括の取り出し／書き戻しが無いので、mtb が list と update
 を回している（`--all` や `--dir` と同じ立場）。利用者はテンプレートの操作を
