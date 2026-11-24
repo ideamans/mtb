@@ -66,6 +66,7 @@ mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi
 mtb profile add stg  --base-url https://stg.example.com/cgi-bin/mt/mt-data-api.cgi
 mtb profile use stg                    # 既定を切り替える
 mtb profile set --site-id 3            # 既定サイトID（--site-id を省ける）
+mtb profile set --admin-url https://example.com/cgi-bin/mt/mt.cgi   # 管理画面の URL（mtb admin-url が使う）
 mtb profile list
 mtb profile show                       # いま実際に使う接続先
 mtb sites entries list --profile prod  # その場だけ切り替える
@@ -80,10 +81,15 @@ mtb sites entries list --profile prod  # その場だけ切り替える
 入力欄は行の編集ができ（矢印キー・Backspace）、版とはい／いいえは
 矢印キーで選びます。確定した答えは `✔` の行で残ります。Ctrl+C で中止します。
 
+URL は**先に管理画面の URL を聞き**、そこから推測した Data API の URL（同じディレクトリの
+`mt-data-api.cgi`）を既定値にして次に聞きます。ブラウザのアドレス欄からそのまま貼れば、
+たいていは Enter だけで済みます。管理画面の URL は `mtb admin-url` が使います。
+
 ```
 $ mtb profile add
 ✔ プロファイル名（例: prod）: mt6
-✔ Data API の URL（例: https://example.com/cgi-bin/mt/mt-data-api.cgi）: https://old.example.com/mt/mt-data-api.cgi
+✔ 管理画面の URL（例: https://example.com/cgi-bin/mt/mt.cgi。分からなければ空のまま Enter）: https://old.example.com/mt/mt.cgi
+✔ Data API の URL（管理画面から推測。違っていれば直す）: https://old.example.com/mt/mt-data-api.cgi
 Data API の版を調べています…
 このサーバは Data API v3 まで使えます
 ✔ Data API の版: v3（このサーバの最新）
@@ -97,6 +103,24 @@ Data API の版を調べています…
 
 `--base-url` は `mt-data-api.cgi` までの URL です。リファレンスからコピーして
 末尾に `/v7` が付いていても、取り除いてバージョンとして解釈します。
+
+### 管理画面の URL（mtb admin-url）
+
+`mtb admin-url <種類> [ID]`（別名 `management-url`）は、オブジェクトを MT の管理画面で開く URL を出します。
+ID を付ければ編集画面、省けば一覧です。通信はしません。AI に作業させたあと、触ったオブジェクトの
+画面をすぐ開いて確かめるためのものです。
+
+```bash
+mtb admin-url entries 123 --site-id 1
+# https://example.com/cgi-bin/mt/mt.cgi?__mode=view&_type=entry&blog_id=1&id=123
+mtb admin-url templates --site-id 1
+mtb admin-url content-data 45 --site-id 1 --content-type-id 3
+```
+
+種類は `entries` `pages` `categories` `folders` `assets` `templates` `content-types` `content-data`
+`users` `roles` `sites` `dashboard` `logs` `settings`。管理画面の URL はプロファイルの `--admin-url`
+（か `MTB_ADMIN_URL`）で、無ければ Data API の URL から推測します（`mt-data-api.cgi` → `mt.cgi`）。
+MT 8 以降を PSGI で動かしていると管理画面が `…/admin` のことがあり、その場合は登録してください。
 
 ### Data API の版
 
@@ -139,6 +163,7 @@ Webサービスパスワードを使うのは v3（MT 6.2）からです。
 | `MTB_PROFILE` | 使うプロファイル名 |
 | `MTB_BASE_URL` | 接続先（プロファイル無しでも動かせる） |
 | `MTB_SITE_ID` | 既定サイトID |
+| `MTB_ADMIN_URL` | 管理画面の URL（`mtb admin-url` が使う。プロファイルの `--admin-url` より強い） |
 | `MTB_USERNAME` / `MTB_PASSWORD` | 非対話サインイン |
 | `MTB_ACCESS_TOKEN` | 取得済みトークンだけで叩く |
 | `MTB_CONFIG_DIR` | 設定ディレクトリ（既定 `~/.config/mtb`）。拡張は `extensions/` に入る |

@@ -24,6 +24,7 @@ cobra のコマンド定義から `go generate ./...` で生成しています�
 | `-v`, `--verbose` | bool | `false` | 送受信の要約を標準エラーに出す |
 | `--verify-publish` | bool | `false` | 保存できたかだけでなく、静的ファイルを書き出せたかまで MT のログで確かめる（失敗なら終了コード 8） |
 | `-y`, `--yes` | bool | `false` | 破壊的な操作の確認を省く |
+- `mtb admin-url <種類> [ID]` `[--content-type-id --site-id]` — オブジェクトの管理画面の URL を出す
 - `mtb api <メソッド> <パス>` `[--all --fields --file --form --no-auth --query --set --set-json]` — 任意のエンドポイントを直接叩く
 
 ## `mtb assets`
@@ -121,10 +122,10 @@ Plugins
 
 接続先プロファイルの管理
 
-- `mtb profile add <名前>` `[--api-version --site-id --use --username]` — プロファイルを追加する
+- `mtb profile add <名前>` `[--admin-url --api-version --site-id --use --username]` — プロファイルを追加する
 - `mtb profile list` — プロファイルの一覧
 - `mtb profile remove <名前>` — プロファイルと、その認証情報を消す
-- `mtb profile set` `[--api-version --site-id --username]` — いまのプロファイルの設定を変える
+- `mtb profile set` `[--admin-url --api-version --site-id --username]` — いまのプロファイルの設定を変える
 - `mtb profile show` — いま使う接続先の解決結果を表示する
 - `mtb profile use <名前>` — 既定のプロファイルを切り替える
 

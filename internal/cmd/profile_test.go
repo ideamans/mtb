@@ -50,8 +50,8 @@ func TestProfileAddRequiresBaseURL(t *testing.T) {
 func TestProfileAddPromptsWhenInteractive(t *testing.T) {
 	h := newHarness(t, withoutProfile())
 	h.prompt.NotInteractive = false
-	h.prompt.Lines = []string{"https://asked.example.com/mt-data-api.cgi"}
-	h.prompt.Confirms = []bool{false} // サインインは別のテストで見る
+	h.prompt.Lines = []string{"", "https://asked.example.com/mt-data-api.cgi"} // 管理画面は飛ばす
+	h.prompt.Confirms = []bool{false}                                          // サインインは別のテストで見る
 
 	h.mustRun("profile", "add", "prod")
 
@@ -69,8 +69,8 @@ func TestProfileAddPromptsWhenInteractive(t *testing.T) {
 func TestProfileAddPromptShowsExample(t *testing.T) {
 	h := newHarness(t, withoutProfile())
 	h.prompt.NotInteractive = false
-	h.prompt.Lines = []string{"https://asked.example.com/mt-data-api.cgi"}
-	h.prompt.Confirms = []bool{false} // サインインは別のテストで見る
+	h.prompt.Lines = []string{"", "https://asked.example.com/mt-data-api.cgi"} // 管理画面は飛ばす
+	h.prompt.Confirms = []bool{false}                                          // サインインは別のテストで見る
 
 	h.mustRun("profile", "add", "prod")
 
@@ -87,7 +87,7 @@ func TestProfileAddPromptShowsExample(t *testing.T) {
 func TestProfileAddWithoutNameListsAndAsks(t *testing.T) {
 	h := newHarness(t)
 	h.prompt.NotInteractive = false
-	h.prompt.Lines = []string{"stg", "https://stg.example.com/mt-data-api.cgi"}
+	h.prompt.Lines = []string{"stg", "", "https://stg.example.com/mt-data-api.cgi"}
 	h.prompt.Confirms = []bool{false}
 
 	out := h.mustRun("profile", "add")

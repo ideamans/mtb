@@ -107,11 +107,15 @@ English in both languages, and `mtb llm` is always Japanese.
 ## 3. Set up a connection when there is none
 
 ```bash
-mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi
+mtb profile add prod --admin-url https://example.com/cgi-bin/mt/mt.cgi \
+  --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi
 mtb profile set --site-id 1     # then --site-id can be omitted
 ```
 
 The base URL ends at `mt-data-api.cgi`. A site's top-level URL gives 404s.
+Ask the user for the admin screen URL they open in the browser too (`--admin-url`);
+with only `--admin-url`, the Data API URL is guessed from it (same directory,
+`mt-data-api.cgi`). MT 8+ on PSGI often uses `…/admin` instead of `mt.cgi`.
 
 **mtb reads `.env` from the current directory**, so the working directory can
 decide which server you talk to (`MTB_PROFILE`, `MTB_BASE_URL`, `MTB_SITE_ID`).
@@ -296,6 +300,24 @@ mtb sites templates publish 1 5
 
 Say whether you rebuilt or not — "I updated the entry" and "the change is live"
 are different claims.
+
+## 8. Link to the admin screen in your report
+
+For every object you created or changed, give the user the admin screen URL so
+they can open and check the result — "see here for details":
+
+```bash
+mtb admin-url entries 123 --site-id 1        # edit screen of entry 123
+mtb admin-url templates --site-id 1          # the template list
+mtb admin-url content-data 45 --site-id 1 --content-type-id 3
+```
+
+Kinds: `entries pages categories folders assets templates content-types
+content-data users roles sites dashboard logs settings`. With an ID it is the edit
+screen, without one the list. Nothing is sent, so it is cheap. If standard error
+says the admin URL was **guessed**, tell the user and ask for the real one
+(`mtb profile set --admin-url`). For many objects, give the list URL plus a few
+representative ones rather than dozens of links.
 
 ## Recovering from errors
 

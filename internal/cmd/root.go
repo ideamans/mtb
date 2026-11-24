@@ -146,6 +146,7 @@ func New(env *Env, args ...string) *App {
 	a.root.AddCommand(
 		a.newAuthCmd(),
 		a.newProfileCmd(),
+		a.newAdminURLCmd(),
 		a.newAPICmd(),
 		a.newCallCmd(),
 		a.newDumpCmd(),

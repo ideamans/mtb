@@ -128,6 +128,17 @@ mtb logs --profile prod --grep timeout --since 7d --count
 `--profile` は history では**絞り込み**として効く。チーム全員の操作（他の端末・他の人）は
 手元のログには無い。それは MtbPro の `mtb audit-logs` で見る。
 
+**12. 作用したオブジェクトには、管理画面の URL を添えて報告する。**
+記事・ページ・テンプレート・アセットなどを作った・直したら、報告に `mtb admin-url` で組んだ
+管理画面の URL を添え、「詳しくはこちらを見てください」と案内する。利用者は mtb と AI が加工した
+結果をすぐ開いて確かめられる（ID だけ伝えられても、管理画面のどこを開けばいいか分からない）。
+URL を組むだけで通信しないので、何本出しても MT に負荷はかからない。詳しくは「管理画面の URL を案内する」。
+
+```bash
+mtb admin-url entries 123 --site-id 1      # 記事 123 の編集画面
+mtb admin-url templates --site-id 1        # テンプレートの一覧
+```
+
 **mtb 本体の更新は `mtb upgrade`。ただし利用者が頼んだときだけ打つ。** 実行ファイルを入れ替える
 操作なので、作業の途中で勝手に上げない。版を確かめるだけなら `mtb upgrade --check --format json`
 （`status`: up-to-date / available / package-manager / source-build / newer-local）。
@@ -256,6 +267,20 @@ mtb sites entries list --profile stg   # その場だけ切り替える
 から名前と URL を聞く。**対話できない場面では聞かずにエラーにする**ので、
 エージェントは `mtb profile add <名前> --base-url <URL>` の形で渡すこと。
 
+**管理画面の URL もプロファイルに持てる**（`--admin-url`。`mtb admin-url` が使う。接続には使わない）。
+対話では先に管理画面の URL を聞き、そこから推測した Data API の URL（同じディレクトリの
+`mt-data-api.cgi`）を既定値にして次に聞く。`--admin-url` だけを渡せば、Data API の URL は推測で埋まる
+（推測したことを標準エラーで言う）。アドレス欄から `?__mode=…` ごと貼っても、問い合わせは落とす。
+
+```bash
+mtb profile add prod --admin-url https://example.com/cgi-bin/mt/mt.cgi \
+  --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi
+mtb profile set --admin-url https://example.com/mt/admin   # あとから足す（空にすると消す）
+```
+
+**MT 8 以降を PSGI で動かしていると、管理画面は `mt.cgi` ではなく `…/admin` のことがある**
+（`AdminScript admin`。mt-launcher の MT もこれ）。利用者が開いている管理画面の URL を聞いて登録する。
+
 優先順位は **フラグ → 環境変数 → プロファイル → 既定値**。
 どのサーバを叩こうとしているか分からなくなったら `mtb profile show`。
 
@@ -277,6 +302,36 @@ mtb sites entries list --profile stg   # その場だけ切り替える
 説明は公式の OpenAPI 定義そのままなので、どちらの言語でも英語で出る
 （mtb が補った注記だけが切り替わる）。**この埋め込みリファレンスは
 言語によらず日本語**。出力を機械で判定するなら `--lang` を明示すること。
+
+## 管理画面の URL を案内する
+
+`mtb admin-url <種類> [ID]`（別名 `management-url`）は、そのオブジェクトを MT の管理画面で開く URL を
+出す。ID を付ければ編集画面、省けば一覧。**通信しない**（URL を組み立てるだけ。サインインも要らない）。
+開くには利用者がブラウザで管理画面にサインインしている必要がある。
+
+| 種類 | 画面 | 要るもの |
+| --- | --- | --- |
+| `entries` `pages` `categories` `folders` `assets` | 記事・ウェブページ・カテゴリ・フォルダ・アセット | サイト |
+| `templates` | テンプレート（一覧は「テンプレートの管理」） | サイト |
+| `content-types` / `content-data` | コンテンツタイプ・コンテンツデータ（MT 7 以降） | サイト。`content-data` は `--content-type-id` も |
+| `users` `roles` | ユーザー・ロール | （システム） |
+| `sites` | ID 付きならそのサイトのダッシュボード、無ければサイトの一覧 | |
+| `dashboard` `logs` | ダッシュボード・ログ（サイトを省くとシステム） | |
+| `settings` | サイトの全般設定 | サイト |
+
+- サイトは `--site-id` か、プロファイルの既定のサイト。単数形（`entry`）でも通る
+- ID は数字だけ受ける（`--extract` が失敗した文がそのまま URL に入る事故を防ぐ）
+- **管理画面の URL が登録されていなければ、Data API の URL から推測する**（`mt-data-api.cgi` → `mt.cgi`）。
+  推測したことを標準エラーで言うので、そのときは利用者に正しい URL を聞いて `mtb profile set --admin-url` で
+  登録してもらう。PSGI の MT（`…/admin`）では推測が外れる
+- 報告にはオブジェクトを作った・直したコマンドの応答の `id` を使う。何件も触ったときは、全部を並べず一覧の
+  URL と代表の数件にする
+
+```bash
+id=$(mtb sites entries create --site-id 1 --set entry.title="お知らせ" --extract id)
+mtb admin-url entries "$id" --site-id 1
+# https://example.com/cgi-bin/mt/mt.cgi?__mode=view&_type=entry&blog_id=1&id=123
+```
 
 ## リソースの組み立てと取り出し
 

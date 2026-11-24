@@ -21,6 +21,9 @@ import (
 // あります（別の形を見せると、どれが正しいのか分からなくなる）。
 const baseURLExample = "https://example.com/cgi-bin/mt/mt-data-api.cgi"
 
+// adminURLExample は管理画面の URL を聞くときに見せる例です。
+const adminURLExample = "https://example.com/cgi-bin/mt/mt.cgi"
+
 // newProfileCmd は接続先の管理コマンドです。
 func (a *App) newProfileCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -102,6 +105,7 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 		username   string
 		apiVersion string
 		siteID     string
+		adminURL   string
 		use        bool
 	)
 	cmd := &cobra.Command{
@@ -117,6 +121,10 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 				"送る前に mtb が止めます）。コマンドごとに版を変える手段はありません。\n\n"+
 				"名前は省けます。省くと、いまあるプロファイルを一覧してから\n"+
 				"名前と URL を聞きます（対話できない場面ではエラーになります）。\n\n"+
+				"URL は先に管理画面（mt.cgi）を聞き、そこから推測した Data API の URL を\n"+
+				"既定値にして次に聞きます。管理画面の URL は mtb admin-url が、操作した\n"+
+				"オブジェクトの管理画面を案内するのに使います（接続には使いません）。\n"+
+				"--admin-url だけを渡すと、Data API の URL は推測したものを使います。\n\n"+
 				"登録できたら、そのままサインインするか聞きます。\n\n"+
 				"--base-url / --client-id / --insecure は共通フラグを使います。\n\n"+
 				"例: mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi",
@@ -131,6 +139,10 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 				"The name is optional. Leave it off and the existing profiles are listed,\n"+
 				"then you are asked for the name and the URL (where there is no terminal\n"+
 				"to prompt on, this is an error instead).\n\n"+
+				"You are asked for the admin screen URL (mt.cgi) first, and the Data API URL\n"+
+				"guessed from it is offered as the default next. mtb admin-url uses the admin\n"+
+				"screen URL to point at the objects you worked on (it is not used to connect).\n"+
+				"With only --admin-url, the guessed Data API URL is used.\n\n"+
 				"Once it is registered you are asked whether to sign in straight away.\n\n"+
 				"--base-url / --client-id / --insecure are the global flags.\n\n"+
 				"Example: mtb profile add prod --base-url https://example.com/cgi-bin/mt/mt-data-api.cgi"),
@@ -155,16 +167,17 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 					"profile %q already exists; change it with mtb profile set --profile %s"), name, name)
 			}
 			baseURL := a.g.baseURL
+			adminURL = config.NormalizeAdminURL(adminURL)
 			if baseURL == "" && a.env.Prompt != nil && a.env.Prompt.Interactive() {
-				// 例を添える。「URL」とだけ聞かれても、サイトのトップと
-				// mt-data-api.cgi までのどちらを入れるのか分からない。
-				// ここを取り違えたときの症状は全コマンドの 404 なので、
-				// 入力の前に見せておく価値がある。
-				baseURL, err = a.env.Prompt.Line(i18n.T(
-					"Data API の URL（例: "+baseURLExample+"）",
-					"Data API URL (e.g. "+baseURLExample+")"), "")
-				if err != nil {
+				if baseURL, adminURL, err = a.askProfileURLs(adminURL); err != nil {
 					return err
+				}
+			} else if baseURL == "" && adminURL != "" {
+				// 対話できない場面で管理画面の URL だけ渡されたら、推測したものを使い、そう伝える
+				if baseURL = config.GuessDataAPIURL(adminURL); baseURL != "" {
+					fmt.Fprintf(a.env.Err, i18n.T(
+						"Data API の URL は管理画面の URL から推測しました: %s（違っていたら --base-url で指定してください）\n",
+						"The Data API URL was guessed from the admin screen URL: %s (pass --base-url if it is wrong)\n"), baseURL)
 				}
 			}
 			if baseURL == "" {
@@ -184,6 +197,7 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 			}
 			f.Profiles[name] = &config.Profile{
 				BaseURL:            base,
+				AdminURL:           adminURL,
 				APIVersion:         version,
 				ClientID:           a.g.clientID,
 				Username:           username,
@@ -197,6 +211,9 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprintf(a.env.Out, i18n.T("プロファイル %s を追加しました（%s/%s）\n", "Added profile %s (%s/%s)\n"), name, base, version)
+			if adminURL != "" {
+				fmt.Fprintf(a.env.Out, i18n.T("管理画面: %s\n", "Admin screen: %s\n"), adminURL)
+			}
 			if f.Current == name {
 				fmt.Fprintln(a.env.Out, i18n.T("既定のプロファイルにしました", "Made it the default profile"))
 			}
@@ -208,6 +225,7 @@ func (a *App) newProfileAddCmd() *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVar(&apiVersion, "api-version", "", i18n.T("Data API の版 v1〜v7（省くとサーバに問い合わせて決める。MT 6.2 は v3）", "Data API version v1 to v7 (leave it off to ask the server; MT 6.2 speaks v3)"))
+	f.StringVar(&adminURL, "admin-url", "", i18n.T("管理画面の URL（例: "+adminURLExample+"。mtb admin-url が使う。--base-url を省くとここから推測する）", "admin screen URL (e.g. "+adminURLExample+"; used by mtb admin-url; without --base-url the Data API URL is guessed from it)"))
 	f.StringVar(&username, "username", "", i18n.T("サインイン名（サインイン時の入力を省くため）", "sign-in name (so you are not asked for it at sign-in)"))
 	f.StringVar(&siteID, "site-id", "", i18n.T("既定のサイトID", "default site ID"))
 	f.BoolVar(&use, "use", false, i18n.T("追加したプロファイルを既定にする", "make the new profile the default"))
@@ -219,6 +237,7 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 		username   string
 		apiVersion string
 		siteID     string
+		adminURL   string
 	)
 	cmd := &cobra.Command{
 		Use:   "set",
@@ -260,6 +279,10 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 					p.ClientID = a.g.clientID
 					changed = true
 				}
+				if cmd.Flags().Changed("admin-url") {
+					p.AdminURL = config.NormalizeAdminURL(adminURL)
+					changed = true
+				}
 				if cmd.Flags().Changed("username") {
 					p.Username = username
 					changed = true
@@ -287,6 +310,7 @@ func (a *App) newProfileSetCmd() *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVar(&apiVersion, "api-version", "", i18n.T("Data API の版 v1〜v7（MT 6.2 は v3）", "Data API version v1 to v7 (MT 6.2 speaks v3)"))
+	f.StringVar(&adminURL, "admin-url", "", i18n.T("管理画面の URL（例: "+adminURLExample+"。空にすると消す）", "admin screen URL (e.g. "+adminURLExample+"; empty to remove it)"))
 	f.StringVar(&username, "username", "", i18n.T("サインイン名", "sign-in name"))
 	f.StringVar(&siteID, "site-id", "", i18n.T("既定のサイトID", "default site ID"))
 	return cmd
@@ -335,6 +359,7 @@ func (a *App) newProfileShowCmd() *cobra.Command {
 			w := tabwriter.NewWriter(a.env.Out, 0, 0, 2, ' ', 0)
 			fmt.Fprintf(w, i18n.T("プロファイル\t%s\n", "Profile\t%s\n"), r.Name)
 			fmt.Fprintf(w, i18n.T("ベースURL\t%s\n", "Base URL\t%s\n"), r.BaseURL)
+			fmt.Fprintf(w, i18n.T("管理画面\t%s\n", "Admin screen\t%s\n"), describeAdminURL(r))
 			fmt.Fprintf(w, i18n.T("APIバージョン\t%s\n", "API version\t%s\n"), config.DescribeVersion(r.APIVersion))
 			fmt.Fprintf(w, i18n.T("クライアントID\t%s\n", "Client ID\t%s\n"), r.ClientID)
 			fmt.Fprintf(w, i18n.T("既定サイトID\t%s\n", "Default site ID\t%s\n"), dash(r.SiteID))
@@ -526,6 +551,53 @@ func (a *App) askProfileName(f *config.File) (string, error) {
 		return "", errors.New(i18n.T("プロファイル名が要ります", "a profile name is required"))
 	}
 	return name, nil
+}
+
+// askProfileURLs は対話で URL を聞きます。先に管理画面、次に Data API。
+//
+// 利用者が知っているのはブラウザで開いている管理画面の URL のほうで、
+// mt-data-api.cgi の場所は知らないことが多い。管理画面から推測した URL を
+// 既定値にすれば、たいていは Enter だけで済む。例は「見せるだけ」で既定値に
+// しない（何も打たずに Enter で example.com が登録されないように）。
+func (a *App) askProfileURLs(adminURL string) (baseURL, admin string, err error) {
+	if adminURL == "" {
+		adminURL, err = a.env.Prompt.Line(i18n.T(
+			"管理画面の URL（例: "+adminURLExample+"。分からなければ空のまま Enter）",
+			"Admin screen URL (e.g. "+adminURLExample+"; leave it empty if you do not know it)"), "")
+		if err != nil {
+			return "", "", err
+		}
+		adminURL = config.NormalizeAdminURL(adminURL)
+	}
+	guess := config.GuessDataAPIURL(adminURL)
+	if config.IsDataAPIURL(adminURL) {
+		// Data API の URL を入れてしまった。それを既定値に回し、管理画面は推測する
+		fmt.Fprintln(a.env.Err, i18n.T(
+			"それは Data API の URL のようです。次の質問の既定値にし、管理画面の URL は推測します",
+			"That looks like the Data API URL; it becomes the default of the next question and the admin screen URL is guessed"))
+		guess, adminURL = adminURL, config.GuessAdminURL(adminURL)
+	}
+	// 例を添える。「URL」とだけ聞かれても、サイトのトップと
+	// mt-data-api.cgi までのどちらを入れるのか分からない。
+	// ここを取り違えたときの症状は全コマンドの 404 なので、
+	// 入力の前に見せておく価値がある。
+	label := i18n.T("Data API の URL（例: "+baseURLExample+"）", "Data API URL (e.g. "+baseURLExample+")")
+	if guess != "" {
+		label = i18n.T("Data API の URL（管理画面から推測。違っていれば直す）", "Data API URL (guessed from the admin screen; correct it if wrong)")
+	}
+	baseURL, err = a.env.Prompt.Line(label, guess)
+	return baseURL, adminURL, err
+}
+
+// describeAdminURL は管理画面の URL を表示用にします。登録が無ければ推測を添えます。
+func describeAdminURL(r *config.Resolved) string {
+	if r.AdminURL != "" {
+		return r.AdminURL
+	}
+	if g := config.GuessAdminURL(r.BaseURL); g != "" {
+		return fmt.Sprintf(i18n.T("-（未登録。推測: %s）", "- (not registered; guessed: %s)"), g)
+	}
+	return "-"
 }
 
 func dash(s string) string {

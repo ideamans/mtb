@@ -149,6 +149,7 @@ func (s *Store) Resolve(o Overrides) (*Resolved, error) {
 		case ok:
 			r.FromFile = true
 			r.BaseURL = p.BaseURL
+			r.AdminURL = p.AdminURL
 			r.APIVersion = p.APIVersion
 			r.ClientID = p.ClientID
 			r.Username = p.Username
@@ -175,6 +176,7 @@ func (s *Store) Resolve(o Overrides) (*Resolved, error) {
 		}
 	}
 	r.APIVersion = firstNonEmpty(r.APIVersion, DefaultAPIVersion)
+	r.AdminURL = NormalizeAdminURL(firstNonEmpty(s.env("MTB_ADMIN_URL"), r.AdminURL))
 	r.ClientID = firstNonEmpty(o.ClientID, s.env("MTB_CLIENT_ID"), r.ClientID, DefaultClientID)
 	r.Username = firstNonEmpty(s.env("MTB_USERNAME"), r.Username)
 	r.SiteID = firstNonEmpty(o.SiteID, s.env("MTB_SITE_ID"), r.SiteID)

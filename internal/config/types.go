@@ -40,6 +40,10 @@ const (
 type Profile struct {
 	// BaseURL は mt-data-api.cgi までの URL です（末尾の /vN は含めません）。
 	BaseURL string `json:"baseUrl"`
+	// AdminURL は管理画面のスクリプトまでの URL です（例: …/mt.cgi。MT 8 以降の
+	// PSGI では …/admin のこともある）。操作したオブジェクトの管理画面を
+	// 案内するのに使います（mtb admin-url）。Data API の接続には使いません。
+	AdminURL string `json:"adminUrl,omitempty"`
 	// APIVersion は空なら v7 です。
 	APIVersion string `json:"apiVersion,omitempty"`
 	// ClientID は空なら mtb です。
@@ -109,8 +113,11 @@ func (f *File) Names() []string {
 // Resolved は環境変数とフラグを重ねた「実際に使う接続先」です。
 type Resolved struct {
 	// Name はプロファイル名です。設定ファイルを使っていないときは "(env)" です。
-	Name       string
-	BaseURL    string
+	Name    string
+	BaseURL string
+	// AdminURL は管理画面の URL です。プロファイルにも MTB_ADMIN_URL にも無ければ空です
+	// （推測は呼び出し側が GuessAdminURL で行い、推測であることを伝えます）。
+	AdminURL   string
 	APIVersion string
 	ClientID   string
 	Username   string
